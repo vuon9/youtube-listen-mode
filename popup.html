@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTB Listen Mode Settings</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="images/icon48.png" alt="Logo" class="logo">
+            <h1>YTB Listen Mode</h1>
+        </div>
+
+        <div class="setting-row">
+            <label class="switch-label" for="autoEnable">
+                <span>Always Enable Listen Mode</span>
+                <input type="checkbox" id="autoEnable">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="channels-section">
+            <h2>Auto-enable for Channels</h2>
+            <div class="input-group">
+                <input type="text" id="channelInput" placeholder="Add channel name...">
+                <button id="addChannelBtn">Add</button>
+            </div>
+            <div id="channelList" class="tags-container">
+                <!-- Tags will be injected here -->
+            </div>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,75 @@
+/* Button styles */
+.ytb-listen-mode-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 10px;
+    /* Match typical YT control padding */
+    vertical-align: middle;
+    opacity: 0.9;
+    transition: opacity 0.1s;
+    width: 48px;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ytb-listen-mode-btn:hover {
+    opacity: 1;
+}
+
+.ytb-listen-mode-btn svg {
+    width: 24px;
+    /* Fix icon size to match other YT controls */
+    height: 24px;
+    fill: #fff;
+}
+
+/* Overlay covering the video player when listen mode is active */
+.ytb-listen-mode-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    /* purely black background as requested? or customized? stick to black/dark */
+    z-index: 100;
+    /* High enough to cover video but maybe below controls? controls are usually z-index > 60 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: Roboto, Arial, sans-serif;
+    pointer-events: none;
+    /* See through for clicks if needed, but we want to block video. Actually controls need to work. */
+}
+
+/* We need controls to be visible. YT controls have high z-index (usually 60+).
+   The video element is 10.
+   So z-index 50 for overlay should cover video but stay under controls. */
+.ytb-listen-mode-overlay {
+    z-index: 10;
+}
+
+/* Icon in overlay */
+.ytb-listen-mode-overlay img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.ytb-listen-mode-overlay span {
+    font-size: 24px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+/* Listen Mode active state */
+.ytb-listen-mode-active video {
+    visibility: hidden !important;
+    /* We don't use opacity 0 on video if we are covering it, but visibility hidden helps performance/rendering */
+}
