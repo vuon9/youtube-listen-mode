@@ -2,9 +2,9 @@
 
 A lightweight Chrome extension that turns any YouTube video into **audio‑only mode**. It adds a small headphones button to the YouTube player controls. When activated, the video element is hidden while the audio keeps playing, saving bandwidth and reducing visual distraction.
 
-Google Store's extension: TBD
+<a rel="noreferrer noopener" href="https://chromewebstore.google.com/detail/youtube-listen-mode/pbhfgfcljjildhfdglggpjnahaclpdcj"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>
 
-Until I have approved extension by Google, this should be easy to install by clone this repo and load it into Chrome as an unpacked package.
+It should also be easy to install by cloning this repo and load it into Chrome as an unpacked package.
 
 ---
 
