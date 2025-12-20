@@ -10,7 +10,7 @@ body {
 .container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .header {
@@ -22,6 +22,12 @@ body {
 .logo {
     width: 24px;
     height: 24px;
+}
+
+.priority-note {
+    color: #777;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 h1 {
@@ -95,18 +101,53 @@ input:checked+.slider::before {
 .input-group {
     display: flex;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
-#channelInput {
+.channels-section input[type=text] {
     flex: 1;
-    padding: 8px;
+    /* padding: 8px; */
     border: 1px solid #ddd;
     border-radius: 4px;
     outline: none;
 }
 
-#addChannelBtn {
+.channels-section h2 {
+    font-weight: normal;
+    margin: 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 7px;
+}
+
+.label-with-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6%;
+    padding: 3px;
+    background-color: #dbd7d7;
+    color: #666;
+    font-size: 11px;
+    transition: background-color 0.2s;
+}
+
+.info-circle:hover {
+    background-color: #ddd;
+    color: #333;
+}
+
+.add-btn {
     padding: 8px 12px;
     background-color: #2196F3;
     color: white;
@@ -116,7 +157,7 @@ input:checked+.slider::before {
     font-weight: 500;
 }
 
-#addChannelBtn:hover {
+.add-btn:hover {
     background-color: #1976D2;
 }
 

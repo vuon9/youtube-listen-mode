@@ -1,14 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
     const autoEnableCheckbox = document.getElementById('autoEnable');
+
+    // Auto-enable list elements
     const channelInput = document.getElementById('channelInput');
     const addChannelBtn = document.getElementById('addChannelBtn');
     const channelListContainer = document.getElementById('channelList');
 
+    // Auto-disable list elements
+    const disableChannelInput = document.getElementById('disableChannelInput');
+    const addDisableChannelBtn = document.getElementById('addDisableChannelBtn');
+    const disableChannelListContainer = document.getElementById('disableChannelList');
+
     // Load settings
-    chrome.storage.local.get(['autoEnable', 'channelList'], (result) => {
+    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
         autoEnableCheckbox.checked = result.autoEnable || false;
-        const channels = result.channelList || [];
-        renderChannels(channels);
+        renderChannels(result.channelList || [], channelListContainer, 'channelList');
+        renderChannels(result.disableChannelList || [], disableChannelListContainer, 'disableChannelList');
     });
 
     // Save autoEnable setting
@@ -16,41 +23,45 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.local.set({ autoEnable: autoEnableCheckbox.checked });
     });
 
-    // Add channel
-    addChannelBtn.addEventListener('click', addChannel);
+    // Add channel events
+    addChannelBtn.addEventListener('click', () => addChannel(channelInput, 'channelList', channelListContainer));
     channelInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addChannel();
+        if (e.key === 'Enter') addChannel(channelInput, 'channelList', channelListContainer);
     });
 
-    function addChannel() {
-        const name = channelInput.value.trim();
+    addDisableChannelBtn.addEventListener('click', () => addChannel(disableChannelInput, 'disableChannelList', disableChannelListContainer));
+    disableChannelInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addChannel(disableChannelInput, 'disableChannelList', disableChannelListContainer);
+    });
+
+    function addChannel(input, storageKey, container) {
+        const name = input.value.trim();
         if (!name) return;
 
-        chrome.storage.local.get(['channelList'], (result) => {
-            const channels = result.channelList || [];
+        chrome.storage.local.get([storageKey], (result) => {
+            const channels = result[storageKey] || [];
             if (!channels.includes(name)) {
                 channels.push(name);
-                chrome.storage.local.set({ channelList: channels }, () => {
-                    renderChannels(channels);
-                    channelInput.value = '';
+                chrome.storage.local.set({ [storageKey]: channels }, () => {
+                    renderChannels(channels, container, storageKey);
+                    input.value = '';
                 });
             }
         });
     }
 
-    // Remove channel
-    function removeChannel(name) {
-        chrome.storage.local.get(['channelList'], (result) => {
-            let channels = result.channelList || [];
+    function removeChannel(name, storageKey, container) {
+        chrome.storage.local.get([storageKey], (result) => {
+            let channels = result[storageKey] || [];
             channels = channels.filter(c => c !== name);
-            chrome.storage.local.set({ channelList: channels }, () => {
-                renderChannels(channels);
+            chrome.storage.local.set({ [storageKey]: channels }, () => {
+                renderChannels(channels, container, storageKey);
             });
         });
     }
 
-    function renderChannels(channels) {
-        channelListContainer.innerHTML = '';
+    function renderChannels(channels, container, storageKey) {
+        container.innerHTML = '';
         channels.forEach(name => {
             const tag = document.createElement('div');
             tag.className = 'tag';
@@ -62,10 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const removeBtn = document.createElement('span');
             removeBtn.className = 'remove-btn';
             removeBtn.innerHTML = '&times;';
-            removeBtn.onclick = () => removeChannel(name);
+            removeBtn.onclick = () => removeChannel(name, storageKey, container);
             tag.appendChild(removeBtn);
 
-            channelListContainer.appendChild(tag);
+            container.appendChild(tag);
         });
     }
 });

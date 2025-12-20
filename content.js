@@ -98,37 +98,55 @@ function getChannelName() {
 
 // Check settings and apply mode
 function checkSettingsAndApply(btn) {
-    chrome.storage.local.get(['autoEnable', 'channelList'], (result) => {
+    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
         const autoEnable = result.autoEnable || false;
         const channelList = result.channelList || [];
+        const disableChannelList = result.disableChannelList || [];
 
-        if (autoEnable) {
-            enableAudioMode(btn);
-            return;
-        }
+        // Need to wait for channel name to load
+        const checkForChannel = setInterval(() => {
+            const channelName = getChannelName();
+            if (channelName) {
+                clearInterval(checkForChannel);
 
-        if (channelList.length > 0) {
-            // Need to wait for channel name to load
-            const checkForChannel = setInterval(() => {
-                const channelName = getChannelName();
-                if (channelName) {
-                    clearInterval(checkForChannel);
-                    if (channelList.includes(channelName)) {
-                        console.log(`Auto-enabling listen mode for channel: ${channelName}`);
-                        enableAudioMode(btn);
-                    }
+                // Priority 1: Global autoEnable (Highest priority)
+                if (autoEnable) {
+                    console.log("Global auto-enable is on (Highest priority)");
+                    enableAudioMode(btn);
+                    return;
                 }
-            }, 500);
 
-            // Stop checking after 10 seconds to avoid infinite loop
-            setTimeout(() => clearInterval(checkForChannel), 10000);
-        }
+                // Priority 2: Auto-disable (Normal priority - Overrides auto-enable list)
+                if (disableChannelList.includes(channelName)) {
+                    console.log(`Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
+                    disableAudioMode(btn);
+                    return;
+                }
+
+                // Priority 3: Auto-enable list (Lowest priority)
+                if (channelList.includes(channelName)) {
+                    console.log(`Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`);
+                    enableAudioMode(btn);
+                    return;
+                }
+            }
+        }, 500);
+
+        // Stop checking after 10 seconds to avoid infinite loop
+        setTimeout(() => clearInterval(checkForChannel), 10000);
     });
 }
 
 function enableAudioMode(btn) {
     const player = document.querySelector('.html5-video-player');
     if (!player || player.classList.contains('ytb-listen-mode-active')) return;
+
+    toggleMode(btn);
+}
+
+function disableAudioMode(btn) {
+    const player = document.querySelector('.html5-video-player');
+    if (!player || !player.classList.contains('ytb-listen-mode-active')) return;
 
     toggleMode(btn);
 }

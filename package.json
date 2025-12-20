@@ -1,0 +1,24 @@
+{
+  "name": "ytb-listen-mode",
+  "version": "1.0.0",
+  "description": "A browser extension to listen to YouTube videos in the background.",
+  "main": "content.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "semantic-release"
+  },
+  "keywords": [
+    "youtube",
+    "listen",
+    "background"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/release-notes-generator": "^12.1.0",
+    "semantic-release": "^23.0.8"
+  }
+}
