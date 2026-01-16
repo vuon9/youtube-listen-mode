@@ -1,6 +1,8 @@
 // YouTube Listen Mode Content Script
 
-console.log("YouTube Listen Mode loaded");
+if (typeof document !== 'undefined') {
+    console.log("YouTube Listen Mode loaded");
+}
 
 let checkInterval = null;
 
@@ -18,6 +20,7 @@ const SVG_VIDEO = `
 
 // Helper to create the button
 function createButton() {
+    if (typeof document === 'undefined') return;
     const btn = document.createElement('button');
     btn.className = 'ytp-button ytb-listen-mode-btn';
     btn.title = 'Listen Mode';
@@ -27,6 +30,7 @@ function createButton() {
 
 // Helper to create the overlay
 function createOverlay() {
+    if (typeof document === 'undefined') return;
     const overlay = document.createElement('div');
     overlay.className = 'ytb-listen-mode-overlay';
 
@@ -45,6 +49,7 @@ function createOverlay() {
 
 // Function to toggle mode
 function toggleMode(btn) {
+    if (typeof document === 'undefined') return;
     const player = document.querySelector('.html5-video-player');
     const video = player.querySelector('video'); // Target video element for safety if needed
     if (!player) return;
@@ -84,6 +89,7 @@ function toggleMode(btn) {
 
 // Helper to get channel name
 function getChannelName() {
+    if (typeof document === 'undefined') return null;
     // Try multiple selectors as YT layout can vary
     const selectors = [
         '#upload-info #channel-name a',
@@ -188,6 +194,7 @@ function disableAudioMode(btn) {
 
 // Observe for player controls
 function init() {
+    if (typeof document === 'undefined') return;
     const observer = new MutationObserver((mutations) => {
         // Only react to significant changes (like adding nodes)
         const hasNewNodes = mutations.some(m => m.addedNodes.length > 0);
@@ -220,8 +227,27 @@ function init() {
 }
 
 // Run init
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        getPriorityMode: function(channelName, settings) {
+            const { autoEnable, channelList, disableChannelList } = settings;
+            if (autoEnable) return 'ENABLED';
+
+            const lowerChannelName = channelName.toLowerCase();
+            const isInDisableList = disableChannelList.some(c => c.toLowerCase() === lowerChannelName);
+            const isInEnableList = channelList.some(c => c.toLowerCase() === lowerChannelName);
+
+            if (isInDisableList) return 'DISABLED';
+            if (isInEnableList) return 'ENABLED';
+            return 'DISABLED';
+        }
+    };
 }
