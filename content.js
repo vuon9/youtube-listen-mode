@@ -2,6 +2,8 @@
 
 console.log("YouTube Listen Mode loaded");
 
+let checkInterval = null;
+
 const SVG_HEADPHONES = `
 <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope yt-icon" style="pointer-events: none; display: block; width: 50%; height: 50%;">
   <path d="M12 3c-4.97 0-9 4.03-9 9v7c0 1.1.9 2 2 2h3c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h3c1.1 0 2-.9 2-2v-7c0-4.97-4.03-9-9-9z"></path>
@@ -96,45 +98,77 @@ function getChannelName() {
     return null;
 }
 
+let debounceTimer = null;
+
 // Check settings and apply mode
 function checkSettingsAndApply(btn) {
-    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
-        const autoEnable = result.autoEnable || false;
-        const channelList = result.channelList || [];
-        const disableChannelList = result.disableChannelList || [];
+    if (debounceTimer) clearTimeout(debounceTimer);
 
-        // Need to wait for channel name to load
-        const checkForChannel = setInterval(() => {
-            const channelName = getChannelName();
-            if (channelName) {
-                clearInterval(checkForChannel);
+    debounceTimer = setTimeout(() => {
+        if (checkInterval) {
+            clearInterval(checkInterval);
+            checkInterval = null;
+        }
 
-                // Priority 1: Global autoEnable (Highest priority)
-                if (autoEnable) {
-                    console.log("Global auto-enable is on (Highest priority)");
-                    enableAudioMode(btn);
-                    return;
-                }
+        chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
+            const autoEnable = result.autoEnable || false;
+            const channelList = result.channelList || [];
+            const disableChannelList = result.disableChannelList || [];
 
-                // Priority 2: Auto-disable (Normal priority - Overrides auto-enable list)
-                if (disableChannelList.includes(channelName)) {
-                    console.log(`Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
-                    disableAudioMode(btn);
-                    return;
-                }
-
-                // Priority 3: Auto-enable list (Lowest priority)
-                if (channelList.includes(channelName)) {
-                    console.log(`Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`);
-                    enableAudioMode(btn);
-                    return;
-                }
+            // Priority 1: Global autoEnable (Highest priority)
+            // Apply immediately if global enable is on
+            if (autoEnable) {
+                console.log("Global auto-enable is on (Highest priority)");
+                enableAudioMode(btn);
+                return;
             }
-        }, 500);
 
-        // Stop checking after 10 seconds to avoid infinite loop
-        setTimeout(() => clearInterval(checkForChannel), 10000);
-    });
+            let attempts = 0;
+            // Need to wait for channel name to load
+            checkInterval = setInterval(() => {
+                attempts++;
+                const channelName = getChannelName();
+                if (channelName) {
+                    // Clear interval immediately upon finding channel or reaching timeout
+                    if (checkInterval) {
+                        clearInterval(checkInterval);
+                        checkInterval = null;
+                    }
+
+                    const lowerChannelName = channelName.toLowerCase();
+                    const isInDisableList = disableChannelList.some(c => c.toLowerCase() === lowerChannelName);
+                    const isInEnableList = channelList.some(c => c.toLowerCase() === lowerChannelName);
+
+                    // Priority 2: Auto-disable (Normal priority - Overrides auto-enable list)
+                    if (isInDisableList) {
+                        console.log(`Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
+                        disableAudioMode(btn);
+                    }
+                    // Priority 3: Auto-enable list (Lowest priority)
+                    else if (isInEnableList) {
+                        console.log(`Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`);
+                        enableAudioMode(btn);
+                    }
+                    // Default: Disable if none of the above rules match (Strict force mode)
+                    else {
+                        console.log(`No rules match for channel: ${channelName}. Defaulting to disabled.`);
+                        disableAudioMode(btn);
+                    }
+                    return;
+                }
+
+                // Stop checking after 10 seconds to avoid infinite loop
+                if (attempts >= 20) {
+                    if (checkInterval) {
+                        clearInterval(checkInterval);
+                        checkInterval = null;
+                    }
+                    // If we timeout and no channel name is found, default to disabled (since Global is already checked)
+                    disableAudioMode(btn);
+                }
+            }, 500);
+        });
+    }, 250); // 250ms debounce
 }
 
 function enableAudioMode(btn) {
@@ -155,6 +189,10 @@ function disableAudioMode(btn) {
 // Observe for player controls
 function init() {
     const observer = new MutationObserver((mutations) => {
+        // Only react to significant changes (like adding nodes)
+        const hasNewNodes = mutations.some(m => m.addedNodes.length > 0);
+        if (!hasNewNodes) return;
+
         // Look for the control bar
         const rightControls = document.querySelector('.ytp-right-controls');
         if (rightControls && !document.querySelector('.ytb-listen-mode-btn')) {
@@ -171,6 +209,14 @@ function init() {
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
+
+    // Handle SPA navigation
+    window.addEventListener('yt-navigate-finish', () => {
+        const btn = document.querySelector('.ytb-listen-mode-btn');
+        if (btn) {
+            checkSettingsAndApply(btn);
+        }
+    });
 }
 
 // Run init

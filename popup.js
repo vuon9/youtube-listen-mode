@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chrome.storage.local.get([storageKey], (result) => {
             const channels = result[storageKey] || [];
-            if (!channels.includes(name)) {
+            if (!channels.some(c => c.toLowerCase() === name.toLowerCase())) {
                 channels.push(name);
                 chrome.storage.local.set({ [storageKey]: channels }, () => {
                     renderChannels(channels, container, storageKey);
