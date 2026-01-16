@@ -1,0 +1,404 @@
+[
+  {
+    "description": "  As a YouTube user\n  I want Listen Mode to follow specific priority rules\n  So that I can force audio-only mode for my favorite channels",
+    "elements": [
+      {
+        "description": "",
+        "id": "listen-mode-priority-logic;global-auto-enable-takes-precedence",
+        "keyword": "Scenario",
+        "line": 6,
+        "name": "Global Auto-Enable takes precedence",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 7,
+            "name": "global auto-enable is \"ON\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1391859
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 8,
+            "name": "\"ChannelA\" is in the \"Always Disable\" list",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 223497
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 9,
+            "name": "I check the mode for \"ChannelA\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 248925
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 10,
+            "name": "the mode should be \"ENABLED\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 245932
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "listen-mode-priority-logic;disable-list-overrides-enable-list",
+        "keyword": "Scenario",
+        "line": 12,
+        "name": "Disable list overrides Enable list",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 13,
+            "name": "global auto-enable is \"OFF\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 116262
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 14,
+            "name": "\"ChannelB\" is in the \"Always Disable\" list",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 157765
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 15,
+            "name": "\"ChannelB\" is in the \"Always Enable\" list",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 196842
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 16,
+            "name": "I check the mode for \"ChannelB\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 145215
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 17,
+            "name": "the mode should be \"DISABLED\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 285780
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "listen-mode-priority-logic;enable-list-works-when-not-disabled",
+        "keyword": "Scenario",
+        "line": 19,
+        "name": "Enable list works when not disabled",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 20,
+            "name": "global auto-enable is \"OFF\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 121372
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 21,
+            "name": "\"ChannelC\" is in the \"Always Enable\" list",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 103394
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 22,
+            "name": "I check the mode for \"ChannelC\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 81662
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 23,
+            "name": "the mode should be \"ENABLED\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 63790
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "listen-mode-priority-logic;default-to-disabled-if-no-rules-match",
+        "keyword": "Scenario",
+        "line": 25,
+        "name": "Default to disabled if no rules match",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 26,
+            "name": "global auto-enable is \"OFF\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 67671
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 27,
+            "name": "\"ChannelD\" is not in any list",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 160883
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 28,
+            "name": "I check the mode for \"ChannelD\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 242185
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 29,
+            "name": "the mode should be \"DISABLED\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 79764
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "listen-mode-priority-logic;case-insensitive-matching",
+        "keyword": "Scenario Outline",
+        "line": 39,
+        "name": "Case insensitive matching",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 32,
+            "name": "global auto-enable is \"OFF\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 73967
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 33,
+            "name": "\"MyChannel\" is in the \"Always Disable\" list",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 72418
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 34,
+            "name": "I check the mode for \"mychannel\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 392881
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 35,
+            "name": "the mode should be \"DISABLED\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 80334
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "listen-mode-priority-logic;case-insensitive-matching",
+        "keyword": "Scenario Outline",
+        "line": 40,
+        "name": "Case insensitive matching",
+        "steps": [
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 32,
+            "name": "global auto-enable is \"OFF\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 66673
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 33,
+            "name": "\"CoolCreator\" is in the \"Always Enable\" list",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 124755
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 34,
+            "name": "I check the mode for \"COOLCREATOR\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 96893
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 35,
+            "name": "the mode should be \"ENABLED\"",
+            "match": {
+              "location": "features/step_definitions/steps.js:2"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 67743
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "listen-mode-priority-logic",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "Listen Mode Priority Logic",
+    "tags": [],
+    "uri": "features/priority.feature"
+  }
+]
