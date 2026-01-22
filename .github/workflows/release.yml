@@ -39,7 +39,7 @@ jobs:
         run: zip -r extension.zip manifest.json content.js popup.js popup.html popup.css styles.css images/
 
       - name: Publish to Chrome Web Store
-        run: npx chrome-webstore-upload-cli@3 upload --source extension.zip --auto-publish --extension-id ${EXTENSION_ID}
+        run: npx chrome-webstore-upload-cli@3 upload --source extension.zip --auto-publish --extensionId ${EXTENSION_ID}
         env:
           EXTENSION_ID: ${{ vars.EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
