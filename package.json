@@ -1,6 +1,6 @@
 {
   "name": "ytb-listen-mode",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A browser extension to listen to YouTube videos in the background.",
   "main": "content.js",
   "scripts": {
