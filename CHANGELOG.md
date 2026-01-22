@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/vuon9/youtube-listen-mode/compare/ytb-listen-mode-v1.2.0...ytb-listen-mode-v1.2.1) (2026-01-22)
+
+
+### Bug Fixes
+
+* missing cmd argument ([a0d30e7](https://github.com/vuon9/youtube-listen-mode/commit/a0d30e714c8df6b6c85e939c90361dbb0c2bf5de))
+* missing cmd argument ([2170db7](https://github.com/vuon9/youtube-listen-mode/commit/2170db74186b7a9371c78fbf38ff5f5d8dfb7045))
+
 ## [1.2.0](https://github.com/vuon9/youtube-listen-mode/compare/ytb-listen-mode-v1.1.0...ytb-listen-mode-v1.2.0) (2026-01-22)
 
 
