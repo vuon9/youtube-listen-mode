@@ -1,6 +1,10 @@
 // YouTube Listen Mode Content Script
 
-console.log("YouTube Listen Mode loaded");
+if (typeof document !== 'undefined') {
+    console.log("YouTube Listen Mode loaded");
+}
+
+let checkInterval = null;
 
 const SVG_HEADPHONES = `
 <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope yt-icon" style="pointer-events: none; display: block; width: 50%; height: 50%;">
@@ -14,8 +18,18 @@ const SVG_VIDEO = `
 </svg>
 `;
 
+const ACTION = { ENABLE: 'enable', DISABLE: 'disable' };
+const REASON = { 
+  GLOBAL: 'global',
+  NO_CHANNEL: 'noChannel', 
+  DISABLE_LIST: 'disableList',
+  ENABLE_LIST: 'enableList',
+  DEFAULT: 'default'
+};
+
 // Helper to create the button
 function createButton() {
+    if (typeof document === 'undefined') return;
     const btn = document.createElement('button');
     btn.className = 'ytp-button ytb-listen-mode-btn';
     btn.title = 'Listen Mode';
@@ -25,6 +39,7 @@ function createButton() {
 
 // Helper to create the overlay
 function createOverlay() {
+    if (typeof document === 'undefined') return;
     const overlay = document.createElement('div');
     overlay.className = 'ytb-listen-mode-overlay';
 
@@ -43,45 +58,30 @@ function createOverlay() {
 
 // Function to toggle mode
 function toggleMode(btn) {
+    if (typeof document === 'undefined') return;
     const player = document.querySelector('.html5-video-player');
-    const video = player.querySelector('video'); // Target video element for safety if needed
     if (!player) return;
 
     const isActive = player.classList.contains('ytb-listen-mode-active');
-
     if (isActive) {
-        // Disable Listen Mode
         player.classList.remove('ytb-listen-mode-active');
         btn.innerHTML = SVG_HEADPHONES;
         btn.title = "Enable Listen Mode";
+        player.querySelector('.ytb-listen-mode-overlay')?.remove();
+        return;
+    }
 
-        // Remove overlay
-        const overlay = player.querySelector('.ytb-listen-mode-overlay');
-        if (overlay) {
-            overlay.remove();
-        }
-    } else {
-        // Enable Listen Mode
-        player.classList.add('ytb-listen-mode-active');
-        btn.innerHTML = SVG_VIDEO;
-        btn.title = "Disable Listen Mode";
-
-        // Inject overlay
-        // We append to the player so it sits on top of video but (hopefully) under controls
-        // Controls are usually at the bottom of the player container or strictly positioned z-indexed children.
-        // Appending usually puts it on top if z-index is handled.
-        if (!player.querySelector('.ytb-listen-mode-overlay')) {
-            const overlay = createOverlay();
-            // Insert before the control bar to avoid messing with it?
-            // Usually appending to player is fine if z-index is managed.
-            // Let's try appending.
-            player.appendChild(overlay);
-        }
+    player.classList.add('ytb-listen-mode-active');
+    btn.innerHTML = SVG_VIDEO;
+    btn.title = "Disable Listen Mode";
+    if (!player.querySelector('.ytb-listen-mode-overlay')) {
+        player.appendChild(createOverlay());
     }
 }
 
 // Helper to get channel name
 function getChannelName() {
+    if (typeof document === 'undefined') return null;
     // Try multiple selectors as YT layout can vary
     const selectors = [
         '#upload-info #channel-name a',
@@ -96,47 +96,77 @@ function getChannelName() {
     return null;
 }
 
-// Check settings and apply mode
-function checkSettingsAndApply(btn) {
-    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
-        const autoEnable = result.autoEnable || false;
-        const channelList = result.channelList || [];
-        const disableChannelList = result.disableChannelList || [];
+// Determine mode action based on settings and channel name
+function getModeAction(settings, channelName) {
+    const { autoEnable, channelList, disableChannelList } = settings;
+    if (autoEnable) return { action: ACTION.ENABLE, reason: REASON.GLOBAL };
+    if (!channelName) return { action: ACTION.DISABLE, reason: REASON.NO_CHANNEL };
+    
+    const lowerName = channelName.toLowerCase();
+    const inDisableList = disableChannelList.some(c => c.toLowerCase() === lowerName);
+    const inEnableList = channelList.some(c => c.toLowerCase() === lowerName);
+    
+    if (inDisableList) return { action: ACTION.DISABLE, reason: REASON.DISABLE_LIST };
+    if (inEnableList) return { action: ACTION.ENABLE, reason: REASON.ENABLE_LIST };
+    return { action: ACTION.DISABLE, reason: REASON.DEFAULT };
+}
 
-        // Need to wait for channel name to load
-        const checkForChannel = setInterval(() => {
-            const channelName = getChannelName();
-            if (channelName) {
-                clearInterval(checkForChannel);
-
-                // Priority 1: Global autoEnable (Highest priority)
-                if (autoEnable) {
-                    console.log("Global auto-enable is on (Highest priority)");
-                    enableAudioMode(btn);
-                    return;
-                }
-
-                // Priority 2: Auto-disable (Normal priority - Overrides auto-enable list)
-                if (disableChannelList.includes(channelName)) {
-                    console.log(`Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
-                    disableAudioMode(btn);
-                    return;
-                }
-
-                // Priority 3: Auto-enable list (Lowest priority)
-                if (channelList.includes(channelName)) {
-                    console.log(`Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`);
-                    enableAudioMode(btn);
-                    return;
-                }
-            }
-        }, 500);
-
-        // Stop checking after 10 seconds to avoid infinite loop
-        setTimeout(() => clearInterval(checkForChannel), 10000);
+// Apply mode based on channel detection
+function applyChannelBasedMode(btn, settings) {
+    return pollChannelName((channelName) => {
+        checkInterval = null;
+        const { action, reason } = getModeAction(settings, channelName);
+        applyMode(btn, action, reason, channelName);
     });
 }
 
+// Poll for channel name with timeout
+function pollChannelName(callback, interval = 500, maxAttempts = 20) {
+    let attempts = 0;
+    const id = setInterval(() => {
+        attempts++;
+        const channelName = getChannelName();
+        if (channelName) {
+            clearInterval(id);
+            callback(channelName);
+            return;
+        }
+        if (attempts >= maxAttempts) {
+            clearInterval(id);
+            callback(null);
+        }
+    }, interval);
+    return id;
+}
+
+let debounceTimer = null;
+
+// Check settings and apply mode
+function checkSettingsAndApply(btn) {
+    if (debounceTimer) clearTimeout(debounceTimer);
+
+    debounceTimer = setTimeout(() => {
+        if (checkInterval) {
+            clearInterval(checkInterval);
+            checkInterval = null;
+        }
+
+        chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
+            const settings = {
+                autoEnable: result.autoEnable || false,
+                channelList: result.channelList || [],
+                disableChannelList: result.disableChannelList || []
+            };
+
+            if (settings.autoEnable) {
+                applyMode(btn, ACTION.ENABLE, REASON.GLOBAL, null);
+                return;
+            }
+
+            checkInterval = applyChannelBasedMode(btn, settings);
+        });
+    }, 250);
+}
 function enableAudioMode(btn) {
     const player = document.querySelector('.html5-video-player');
     if (!player || player.classList.contains('ytb-listen-mode-active')) return;
@@ -151,10 +181,35 @@ function disableAudioMode(btn) {
     toggleMode(btn);
 }
 
+function applyMode(btn, action, reason, channelName) {
+    if (action === ACTION.ENABLE) {
+        const msg = reason === REASON.GLOBAL 
+            ? 'Global auto-enable is on (Highest priority)' 
+            : `Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`;
+        console.log(msg);
+        enableAudioMode(btn);
+        return;
+    }
+    
+    if (reason === REASON.DISABLE_LIST) {
+        console.log(`Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
+    } else if (reason === REASON.NO_CHANNEL) {
+        console.log('Auto-disabling listen mode (channel name not found)');
+    } else {
+        console.log(`No rules match for channel: ${channelName}. Defaulting to disabled.`); 
+    }
+    
+    disableAudioMode(btn);
+}
 
 // Observe for player controls
 function init() {
+    if (typeof document === 'undefined') return;
     const observer = new MutationObserver((mutations) => {
+        // Only react to significant changes (like adding nodes)
+        const hasNewNodes = mutations.some(m => m.addedNodes.length > 0);
+        if (!hasNewNodes) return;
+
         // Look for the control bar
         const rightControls = document.querySelector('.ytp-right-controls');
         if (rightControls && !document.querySelector('.ytb-listen-mode-btn')) {
@@ -171,11 +226,30 @@ function init() {
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
+
+    // Handle SPA navigation
+    window.addEventListener('yt-navigate-finish', () => {
+        const btn = document.querySelector('.ytb-listen-mode-btn');
+        if (btn) {
+            checkSettingsAndApply(btn);
+        }
+    });
 }
 
 // Run init
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+}
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        getPriorityMode: function(channelName, settings) {
+            const { action } = getModeAction(settings, channelName);
+            return action === ACTION.ENABLE ? 'ENABLED' : 'DISABLED';
+        }
+    };
 }
