@@ -18,6 +18,15 @@ const SVG_VIDEO = `
 </svg>
 `;
 
+const ACTION = { ENABLE: 'enable', DISABLE: 'disable' };
+const REASON = { 
+  GLOBAL: 'global',
+  NO_CHANNEL: 'noChannel', 
+  DISABLE_LIST: 'disableList',
+  ENABLE_LIST: 'enableList',
+  DEFAULT: 'default'
+};
+
 // Helper to create the button
 function createButton() {
     if (typeof document === 'undefined') return;
@@ -51,39 +60,22 @@ function createOverlay() {
 function toggleMode(btn) {
     if (typeof document === 'undefined') return;
     const player = document.querySelector('.html5-video-player');
-    const video = player.querySelector('video'); // Target video element for safety if needed
     if (!player) return;
 
     const isActive = player.classList.contains('ytb-listen-mode-active');
-
     if (isActive) {
-        // Disable Listen Mode
         player.classList.remove('ytb-listen-mode-active');
         btn.innerHTML = SVG_HEADPHONES;
         btn.title = "Enable Listen Mode";
+        player.querySelector('.ytb-listen-mode-overlay')?.remove();
+        return;
+    }
 
-        // Remove overlay
-        const overlay = player.querySelector('.ytb-listen-mode-overlay');
-        if (overlay) {
-            overlay.remove();
-        }
-    } else {
-        // Enable Listen Mode
-        player.classList.add('ytb-listen-mode-active');
-        btn.innerHTML = SVG_VIDEO;
-        btn.title = "Disable Listen Mode";
-
-        // Inject overlay
-        // We append to the player so it sits on top of video but (hopefully) under controls
-        // Controls are usually at the bottom of the player container or strictly positioned z-indexed children.
-        // Appending usually puts it on top if z-index is handled.
-        if (!player.querySelector('.ytb-listen-mode-overlay')) {
-            const overlay = createOverlay();
-            // Insert before the control bar to avoid messing with it?
-            // Usually appending to player is fine if z-index is managed.
-            // Let's try appending.
-            player.appendChild(overlay);
-        }
+    player.classList.add('ytb-listen-mode-active');
+    btn.innerHTML = SVG_VIDEO;
+    btn.title = "Disable Listen Mode";
+    if (!player.querySelector('.ytb-listen-mode-overlay')) {
+        player.appendChild(createOverlay());
     }
 }
 
@@ -104,6 +96,49 @@ function getChannelName() {
     return null;
 }
 
+// Determine mode action based on settings and channel name
+function getModeAction(settings, channelName) {
+    const { autoEnable, channelList, disableChannelList } = settings;
+    if (autoEnable) return { action: ACTION.ENABLE, reason: REASON.GLOBAL };
+    if (!channelName) return { action: ACTION.DISABLE, reason: REASON.NO_CHANNEL };
+    
+    const lowerName = channelName.toLowerCase();
+    const inDisableList = disableChannelList.some(c => c.toLowerCase() === lowerName);
+    const inEnableList = channelList.some(c => c.toLowerCase() === lowerName);
+    
+    if (inDisableList) return { action: ACTION.DISABLE, reason: REASON.DISABLE_LIST };
+    if (inEnableList) return { action: ACTION.ENABLE, reason: REASON.ENABLE_LIST };
+    return { action: ACTION.DISABLE, reason: REASON.DEFAULT };
+}
+
+// Apply mode based on channel detection
+function applyChannelBasedMode(btn, settings) {
+    return pollChannelName((channelName) => {
+        checkInterval = null;
+        const { action, reason } = getModeAction(settings, channelName);
+        applyMode(btn, action, reason, channelName);
+    });
+}
+
+// Poll for channel name with timeout
+function pollChannelName(callback, interval = 500, maxAttempts = 20) {
+    let attempts = 0;
+    const id = setInterval(() => {
+        attempts++;
+        const channelName = getChannelName();
+        if (channelName) {
+            clearInterval(id);
+            callback(channelName);
+            return;
+        }
+        if (attempts >= maxAttempts) {
+            clearInterval(id);
+            callback(null);
+        }
+    }, interval);
+    return id;
+}
+
 let debounceTimer = null;
 
 // Check settings and apply mode
@@ -117,66 +152,21 @@ function checkSettingsAndApply(btn) {
         }
 
         chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
-            const autoEnable = result.autoEnable || false;
-            const channelList = result.channelList || [];
-            const disableChannelList = result.disableChannelList || [];
+            const settings = {
+                autoEnable: result.autoEnable || false,
+                channelList: result.channelList || [],
+                disableChannelList: result.disableChannelList || []
+            };
 
-            // Priority 1: Global autoEnable (Highest priority)
-            // Apply immediately if global enable is on
-            if (autoEnable) {
-                console.log("Global auto-enable is on (Highest priority)");
-                enableAudioMode(btn);
+            if (settings.autoEnable) {
+                applyMode(btn, ACTION.ENABLE, REASON.GLOBAL, null);
                 return;
             }
 
-            let attempts = 0;
-            // Need to wait for channel name to load
-            checkInterval = setInterval(() => {
-                attempts++;
-                const channelName = getChannelName();
-                if (channelName) {
-                    // Clear interval immediately upon finding channel or reaching timeout
-                    if (checkInterval) {
-                        clearInterval(checkInterval);
-                        checkInterval = null;
-                    }
-
-                    const lowerChannelName = channelName.toLowerCase();
-                    const isInDisableList = disableChannelList.some(c => c.toLowerCase() === lowerChannelName);
-                    const isInEnableList = channelList.some(c => c.toLowerCase() === lowerChannelName);
-
-                    // Priority 2: Auto-disable (Normal priority - Overrides auto-enable list)
-                    if (isInDisableList) {
-                        console.log(`Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
-                        disableAudioMode(btn);
-                    }
-                    // Priority 3: Auto-enable list (Lowest priority)
-                    else if (isInEnableList) {
-                        console.log(`Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`);
-                        enableAudioMode(btn);
-                    }
-                    // Default: Disable if none of the above rules match (Strict force mode)
-                    else {
-                        console.log(`No rules match for channel: ${channelName}. Defaulting to disabled.`);
-                        disableAudioMode(btn);
-                    }
-                    return;
-                }
-
-                // Stop checking after 10 seconds to avoid infinite loop
-                if (attempts >= 20) {
-                    if (checkInterval) {
-                        clearInterval(checkInterval);
-                        checkInterval = null;
-                    }
-                    // If we timeout and no channel name is found, default to disabled (since Global is already checked)
-                    disableAudioMode(btn);
-                }
-            }, 500);
+            checkInterval = applyChannelBasedMode(btn, settings);
         });
-    }, 250); // 250ms debounce
+    }, 250);
 }
-
 function enableAudioMode(btn) {
     const player = document.querySelector('.html5-video-player');
     if (!player || player.classList.contains('ytb-listen-mode-active')) return;
@@ -191,6 +181,26 @@ function disableAudioMode(btn) {
     toggleMode(btn);
 }
 
+function applyMode(btn, action, reason, channelName) {
+    if (action === ACTION.ENABLE) {
+        const msg = reason === REASON.GLOBAL 
+            ? 'Global auto-enable is on (Highest priority)' 
+            : `Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`;
+        console.log(msg);
+        enableAudioMode(btn);
+        return;
+    }
+    
+    if (reason === REASON.DISABLE_LIST) {
+        console.log(`Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
+    } else if (reason === REASON.NO_CHANNEL) {
+        console.log('Auto-disabling listen mode (channel name not found)');
+    } else {
+        console.log(`No rules match for channel: ${channelName}. Defaulting to disabled.`); 
+    }
+    
+    disableAudioMode(btn);
+}
 
 // Observe for player controls
 function init() {
@@ -238,16 +248,8 @@ if (typeof document !== 'undefined') {
 if (typeof module !== 'undefined') {
     module.exports = {
         getPriorityMode: function(channelName, settings) {
-            const { autoEnable, channelList, disableChannelList } = settings;
-            if (autoEnable) return 'ENABLED';
-
-            const lowerChannelName = channelName.toLowerCase();
-            const isInDisableList = disableChannelList.some(c => c.toLowerCase() === lowerChannelName);
-            const isInEnableList = channelList.some(c => c.toLowerCase() === lowerChannelName);
-
-            if (isInDisableList) return 'DISABLED';
-            if (isInEnableList) return 'ENABLED';
-            return 'DISABLED';
+            const { action } = getModeAction(settings, channelName);
+            return action === ACTION.ENABLE ? 'ENABLED' : 'DISABLED';
         }
     };
 }
