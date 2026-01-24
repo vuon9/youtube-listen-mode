@@ -20,6 +20,7 @@ jobs:
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: node
 
   publish:
     needs: release-please
@@ -29,15 +30,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.release-please.outputs.tag_name }}
-
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
+          node-version: '22'
+          cache: 'npm'
       - name: Package extension
         run: zip -r extension.zip manifest.json content.js popup.js popup.html popup.css styles.css images/
-
       - name: Publish to Chrome Web Store
         run: npx chrome-webstore-upload-cli@3 upload --source extension.zip --auto-publish --extensionId ${EXTENSION_ID}
         env:

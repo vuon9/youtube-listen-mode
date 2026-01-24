@@ -1,21 +1,26 @@
 {
-  "name": "ytb-listen-mode",
+  "name": "youtube-listen-mode",
   "version": "1.2.1",
   "description": "A browser extension to listen to YouTube videos in the background.",
   "main": "content.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vuon9/youtube-listen-mode"
+  },
   "scripts": {
     "test": "nyc cucumber-js --format json:cucumber_report.json && node report.js"
   },
   "keywords": [
     "youtube",
     "listen",
-    "background"
+    "chrome",
+    "extension"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Vuong",
+  "license": "MIT",
   "devDependencies": {
     "@cucumber/cucumber": "^12.5.0",
-    "cucumber-html-reporter": "^7.2.0",
+    "cucumber-html-reporter": "^6.0.0",
     "jest": "^30.2.0",
     "nyc": "^17.1.0"
   }
