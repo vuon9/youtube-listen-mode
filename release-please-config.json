@@ -1,7 +1,7 @@
 {
   "packages": {
     ".": {
-      "package-name": "ytb-listen-mode",
+      "package-name": "youtube-listen-mode",
       "release-type": "node",
       "extra-files": [
         "manifest.json"
