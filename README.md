@@ -1,6 +1,6 @@
 # 🎧 YouTube Listen Mode Chrome Extension
 
-A lightweight Chrome extension that turns any YouTube video into **audio‑only mode**. It adds a small headphones button to the YouTube player controls. When activated, the video element is hidden while the audio keeps playing, saving bandwidth and reducing visual distraction.
+A lightweight Chrome extension that turns watching Youtube video into **audio‑only mode**.
 
 <a rel="noreferrer noopener" href="https://chromewebstore.google.com/detail/youtube-listen-mode/pbhfgfcljjildhfdglggpjnahaclpdcj"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>
 
@@ -14,8 +14,7 @@ It should also be easy to install by cloning this repo and load it into Chrome a
 |---------|-------------|
 | **One‑click toggle** | A headphones / video icon appears in the player bar to switch between normal video and audio‑only mode. |
 | **Overlay when audio‑only** | A dark overlay with the extension icon and the text “Audio Only Mode” appears over the video area. |
-| **Auto‑enable options** | • **Always enable** – automatically start in audio‑only mode on every YouTube page.<br>• **Channel whitelist** – specify a list of channel names that should auto‑enable the mode. |
-| **Auto-enable by channel names** | A clean popup (opened from the Chrome extensions toolbar) lets you toggle the auto‑enable flag and manage the channel whitelist with add/remove tags. |
+| **Auto‑enable/disable options** |Automatically start (or stop) audio‑only mode by channels. |
 
 ## Screenshots
 
