@@ -2,7 +2,7 @@
 
 A lightweight Chrome extension that turns watching Youtube video into **audio‑only mode**.
 
-<a rel="noreferrer noopener" href="https://chromewebstore.google.com/detail/youtube-listen-mode/pbhfgfcljjildhfdglggpjnahaclpdcj"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/youtube-listen-mode/pbhfgfcljjildhfdglggpjnahaclpdcj)
 
 It should also be easy to install by cloning this repo and load it into Chrome as an unpacked package.
 
@@ -14,7 +14,8 @@ It should also be easy to install by cloning this repo and load it into Chrome a
 |---------|-------------|
 | **One‑click toggle** | A headphones / video icon appears in the player bar to switch between normal video and audio‑only mode. |
 | **Overlay when audio‑only** | A dark overlay with the extension icon and the text “Audio Only Mode” appears over the video area. |
-| **Auto‑enable/disable options** |Automatically start (or stop) audio‑only mode by channels. |
+| **Bandwidth Saver** | **[NEW]** Automatically switches video quality to the lowest setting (144p/tiny) when enabled, and restores your previous quality when disabled. |
+| **Auto-enable logic** | Configure how the extension activates automatically:<br>• **Global auto-enable**: Starts audio-only mode on every YouTube page.<br>• **Channel whitelists**: Specify channel names to automatically enable the mode.<br>• **Priority-based logic**: Handles conflicts between global and channel-specific settings. |
 
 ## Screenshots
 

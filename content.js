@@ -1,7 +1,7 @@
 // YouTube Listen Mode Content Script
 
 if (typeof document !== 'undefined') {
-    console.log("YouTube Listen Mode loaded");
+    console.log("[YLM] YouTube Listen Mode loaded");
 }
 
 let checkInterval = null;
@@ -56,6 +56,23 @@ function createOverlay() {
     return overlay;
 }
 
+// Function to update video quality
+function updateVideoQuality(enable) {
+    if (typeof document === 'undefined') return;
+    const quality = enable ? 'tiny' : 'default';
+    
+    console.log(`[YLM] Setting video quality to: ${quality}`);
+
+    // Instead of injecting a script directly (which is blocked by CSP), 
+    // we use a custom event that is listened to by the MAIN world script (inject.js).
+    if (typeof window !== 'undefined' && typeof CustomEvent !== 'undefined') {
+        const event = new CustomEvent('ytb-listen-mode-quality', {
+            detail: { quality: quality }
+        });
+        window.dispatchEvent(event);
+    }
+}
+
 // Function to toggle mode
 function toggleMode(btn) {
     if (typeof document === 'undefined') return;
@@ -68,6 +85,7 @@ function toggleMode(btn) {
         btn.innerHTML = SVG_HEADPHONES;
         btn.title = "Enable Listen Mode";
         player.querySelector('.ytb-listen-mode-overlay')?.remove();
+        updateVideoQuality(false);
         return;
     }
 
@@ -77,6 +95,7 @@ function toggleMode(btn) {
     if (!player.querySelector('.ytb-listen-mode-overlay')) {
         player.appendChild(createOverlay());
     }
+    updateVideoQuality(true);
 }
 
 // Helper to get channel name
@@ -184,19 +203,19 @@ function disableAudioMode(btn) {
 function applyMode(btn, action, reason, channelName) {
     if (action === ACTION.ENABLE) {
         const msg = reason === REASON.GLOBAL 
-            ? 'Global auto-enable is on (Highest priority)' 
-            : `Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`;
+            ? '[YLM] Global auto-enable is on (Highest priority)' 
+            : `[YLM] Auto-enabling listen mode for channel: ${channelName} (Lowest priority)`;
         console.log(msg);
         enableAudioMode(btn);
         return;
     }
     
     if (reason === REASON.DISABLE_LIST) {
-        console.log(`Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
+        console.log(`[YLM] Auto-disabling listen mode for channel: ${channelName} (Normal priority)`);
     } else if (reason === REASON.NO_CHANNEL) {
-        console.log('Auto-disabling listen mode (channel name not found)');
+        console.log('[YLM] Auto-disabling listen mode (channel name not found)');
     } else {
-        console.log(`No rules match for channel: ${channelName}. Defaulting to disabled.`); 
+        console.log(`[YLM] No rules match for channel: ${channelName}. Defaulting to disabled.`); 
     }
     
     disableAudioMode(btn);
@@ -218,7 +237,7 @@ function init() {
 
             // Insert before the settings button or at the start
             rightControls.insertBefore(btn, rightControls.firstChild);
-            console.log("Listen Mode button injected");
+            console.log("[YLM] Listen Mode button injected");
 
             // Check settings when button is injected (implies player loaded)
             checkSettingsAndApply(btn);
@@ -250,6 +269,7 @@ if (typeof module !== 'undefined') {
         getPriorityMode: function(channelName, settings) {
             const { action } = getModeAction(settings, channelName);
             return action === ACTION.ENABLE ? 'ENABLED' : 'DISABLED';
-        }
+        },
+        updateVideoQuality: updateVideoQuality 
     };
 }
