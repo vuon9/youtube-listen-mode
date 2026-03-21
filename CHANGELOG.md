@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.2.2...v1.3.0) (2026-03-21)
+
+
+### Features
+
+* add lowest quality mode to save bandwidth ([#12](https://github.com/vuon9/youtube-listen-mode/issues/12)) ([2415d56](https://github.com/vuon9/youtube-listen-mode/commit/2415d567d0052bf4bb1a681addcb1d940e4b1eef))
+
 ## [1.2.2](https://github.com/vuon9/youtube-listen-mode/compare/ytb-listen-mode-v1.2.1...v1.2.2) (2026-01-24)
 
 
