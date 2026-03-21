@@ -9,4 +9,3 @@ Love YouTube but tired of the data-heavy video stream? YouTube Listen Mode turns
 • Priority Logic: Intelligent handling of your global and channel-specific preferences.
 
 Open Source & Transparent: https://github.com/vuon9/youtube-listen-mode
-Stop watching. Start listening.

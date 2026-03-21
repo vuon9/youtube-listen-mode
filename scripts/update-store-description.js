@@ -30,7 +30,7 @@ async function updateStoreDescription() {
         }
 
         const accessToken = tokenData.access_token;
-        const description = fs.readFileSync('STORE_DESCRIPTION.txt', 'utf8');
+        const description = fs.readFileSync('docs/STORE_DESCRIPTION.txt', 'utf8');
 
         console.log('Updating store description...');
         const updateResponse = await fetch(`https://www.googleapis.com/chromewebstore/v1.1/items/${extensionId}`, {
