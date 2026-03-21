@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/vuon9/youtube-listen-mode/compare/v1.4.0...v1.4.1) (2026-03-21)
+
+
+### Bug Fixes
+
+* auto description ([#16](https://github.com/vuon9/youtube-listen-mode/issues/16)) ([b3a81c7](https://github.com/vuon9/youtube-listen-mode/commit/b3a81c7305d53911b1f396886481bf4d83489c41))
+
 ## [1.4.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.3.0...v1.4.0) (2026-03-21)
 
 
