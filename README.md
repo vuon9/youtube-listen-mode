@@ -21,7 +21,7 @@ It should also be easy to install by cloning this repo and load it into Chrome a
 
 Extension settings:
 
-![ytb-listen-mode](./screenshots/extension_v1.1.png)
+<img width="330" height="378" alt="image" src="https://github.com/user-attachments/assets/60aa6107-5b57-4abd-9cc2-98989ab7beea" />
 
 Audio Mode:
 
