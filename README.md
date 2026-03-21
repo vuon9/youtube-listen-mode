@@ -34,7 +34,7 @@ Audio Mode:
 Check out the following guides to learn more about developing and maintaining this project:
 
 - **[Release Guide](docs/RELEASE.md)**: How to publish new versions to the Chrome Web Store.
-- **[Store Description](docs/STORE_DESCRIPTION.md)**: The current listing text.
+- **[Store Description](docs/STORE_DESCRIPTION.txt)**: The current listing text.
 
 ## 📜 License
 
