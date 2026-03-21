@@ -4,8 +4,6 @@ A lightweight Chrome extension that turns watching Youtube video into **audio‑
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/youtube-listen-mode/pbhfgfcljjildhfdglggpjnahaclpdcj)
 
-It should also be easy to install by cloning this repo and load it into Chrome as an unpacked package.
-
 ---
 
 ## ✨ Features
