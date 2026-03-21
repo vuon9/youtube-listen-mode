@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/vuon9/youtube-listen-mode/compare/v1.4.2...v1.4.3) (2026-03-21)
+
+
+### Bug Fixes
+
+* Update README to remove installation instructions ([e9ecf80](https://github.com/vuon9/youtube-listen-mode/commit/e9ecf804e16855b81d959ea08ce5ac2d18b02fc7))
+
 ## [1.4.2](https://github.com/vuon9/youtube-listen-mode/compare/v1.4.1...v1.4.2) (2026-03-21)
 
 
