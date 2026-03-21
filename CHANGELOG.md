@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/vuon9/youtube-listen-mode/compare/v1.4.1...v1.4.2) (2026-03-21)
+
+
+### Bug Fixes
+
+* include missing inject.js in package and fix store description file extension mismatch ([#19](https://github.com/vuon9/youtube-listen-mode/issues/19)) ([5af2dfa](https://github.com/vuon9/youtube-listen-mode/commit/5af2dfa4c3ae8beba267455c7527a0339e024c39))
+
 ## [1.4.1](https://github.com/vuon9/youtube-listen-mode/compare/v1.4.0...v1.4.1) (2026-03-21)
 
 
