@@ -15,7 +15,7 @@ It should also be easy to install by cloning this repo and load it into Chrome a
 | **One‑click toggle** | A headphones / video icon appears in the player bar to switch between normal video and audio‑only mode. |
 | **Overlay when audio‑only** | A dark overlay with the extension icon and the text “Audio Only Mode” appears over the video area. |
 | **Bandwidth Saver** | **[NEW]** Automatically switches video quality to the lowest setting (144p/tiny) when enabled, and restores your previous quality when disabled. |
-| **Auto-enable logic** | Configure how the extension activates automatically: • **Global auto-enable** (Starts audio-only mode on every YouTube page) • **Channel whitelists** (Specify channel names) • **Priority-based logic** (Handles conflicts). |
+| **Auto-enable logic** | Configure how the extension activates automatically: <br /> • **Global auto-enable** (Starts audio-only mode on every YouTube page) <br /> • **Channel whitelists** (Specify channel names) <br /> • **Priority-based logic** (Handles conflicts). |
 
 ## Screenshots
 
