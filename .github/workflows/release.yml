@@ -36,7 +36,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - name: Package extension
-        run: zip -r extension.zip manifest.json content.js popup.js popup.html popup.css styles.css images/
+        run: zip -r extension.zip manifest.json content.js inject.js popup.js popup.html popup.css styles.css images/
       - name: Update Store Description
         run: node scripts/update-store-description.js
         env:
