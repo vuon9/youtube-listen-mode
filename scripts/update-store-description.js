@@ -37,12 +37,18 @@ async function updateStoreDescription() {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
                 'x-goog-api-version': '2'
             },
             body: JSON.stringify({
                 detailed_description: description
             })
         });
+
+        if (!updateResponse.ok) {
+            const errorText = await updateResponse.text();
+            throw new Error(`Google API returned status ${updateResponse.status}: ${errorText}`);
+        }
 
         const updateData = await updateResponse.json();
         if (updateData.uploadState === 'FAILURE' || updateData.error_code) {
