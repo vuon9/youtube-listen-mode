@@ -1,6 +1,6 @@
 {
   "name": "youtube-listen-mode",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "A browser extension to listen to YouTube videos in the background.",
   "main": "content.js",
   "repository": {
