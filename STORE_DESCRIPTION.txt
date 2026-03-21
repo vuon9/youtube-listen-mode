@@ -1,0 +1,12 @@
+🎧 YouTube Listen Mode: Pure Audio, Zero Distraction.
+
+Love YouTube but tired of the data-heavy video stream? YouTube Listen Mode turns your favorite videos into a background audio experience with a single click. Save bandwidth, reduce CPU usage, and focus on the content that matters.
+
+✨ Key Features:
+• One-Click Toggle: Instantly switch between video and audio-only mode.
+• Auto-Enable Rulers: Set it to activate globally or only for specific channels.
+• Bandwidth Saver (NEW): Automatically drops video quality to 144p when enabled, then perfectly restores it when you’re done.
+• Priority Logic: Intelligent handling of your global and channel-specific preferences.
+
+Open Source & Transparent: https://github.com/vuon9/youtube-listen-mode
+Stop watching. Start listening.
