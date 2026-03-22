@@ -1,4 +1,4 @@
-# 🎧 YouTube Listen Mode Chrome Extension
+# 🎧 YouTube Listen Mode
 
 A lightweight Chrome extension that turns watching Youtube video into **audio‑only mode**.
 
