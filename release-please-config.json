@@ -3,6 +3,7 @@
     ".": {
       "package-name": "youtube-listen-mode",
       "release-type": "node",
+      "include-component-in-tag": false,
       "extra-files": [
         "manifest.json"
       ]
