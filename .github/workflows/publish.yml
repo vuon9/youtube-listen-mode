@@ -26,7 +26,8 @@ jobs:
           else
             gh release download ${{ github.event.inputs.tag }} --pattern "*.zip" --clobber
           fi
-          mv *.zip extension.zip
+          # Safely rename to extension.zip only if needed
+          [ -f extension.zip ] || mv *.zip extension.zip
 
       - name: Publish to Chrome Web Store
         run: npx chrome-webstore-upload-cli@3 upload --source extension.zip --auto-publish --extensionId ${EXTENSION_ID}

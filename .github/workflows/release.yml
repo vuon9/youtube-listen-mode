@@ -1,4 +1,4 @@
-name: Release and Publish
+name: Release new version
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
