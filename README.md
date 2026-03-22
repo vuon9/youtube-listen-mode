@@ -13,8 +13,9 @@ A lightweight Chrome extension that turns watching Youtube video into **audio‑
 | :--- | :--- |
 | **One‑click toggle** | A headphones / video icon appears in the player bar to switch between normal video and audio‑only mode. |
 | **Overlay when audio‑only** | A dark overlay with the extension icon and the text “Audio Only Mode” appears over the video area. |
-| **Bandwidth Saver** | **[NEW]** Automatically switches video quality to the lowest setting (144p/tiny) when enabled, and restores your previous quality when disabled. |
-| **Auto-enable logic** | Configure how the extension activates automatically: <br /> • **Global auto-enable** (Starts audio-only mode on every YouTube page) <br /> • **Channel whitelists** (Specify channel names) <br /> • **Priority-based logic** (Handles conflicts). |
+| **Bandwidth Saver** | Automatically switches video quality to the lowest setting (144p/tiny) when enabled, and restores your previous quality when disabled. |
+| **Smart Channel Matching** | **[NEW]** Powerful filtering with substring and Regex support: <br /> • **Exact**: `Lofi Girl` <br /> • **Prefix**: `/^The/i` <br /> • **Suffix**: ` Topic` <br /> • **Advanced**: `/(Music|Records|VEVO)$/i` |
+| **Auto-enable logic** | Intelligent priority-based handling: <br /> 1. **Global Always Enable** (Highest) <br /> 2. **Disable for Channels** (Overrides enable list) <br /> 3. **Enable for Channels** (Lowest) |
 <!-- markdownlint-enable MD033 -->
 
 ## Screenshots

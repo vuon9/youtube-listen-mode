@@ -101,18 +101,57 @@ function toggleMode(btn) {
 // Helper to get channel name
 function getChannelName() {
     if (typeof document === 'undefined') return null;
-    // Try multiple selectors as YT layout can vary
+    
+    // Try reliable metadata first
+    const metaAuthor = document.querySelector('[itemprop="author"] [itemprop="name"]') || 
+                       document.querySelector('[itemprop="author"] link[itemprop="name"]');
+    if (metaAuthor) {
+        const name = metaAuthor.getAttribute('content') || metaAuthor.textContent;
+        if (name) return name.trim().replace(/\s+/g, ' ');
+    }
+
+    // Modern YouTube selectors
     const selectors = [
         '#upload-info #channel-name a',
         'ytd-video-owner-renderer #channel-name a',
-        '.ytd-channel-name a'
+        'ytd-video-owner-renderer #owner-name a',
+        '#owner #channel-name a',
+        '.ytd-channel-name a',
+        '#channel-name yt-formatted-string',
+        '#owner-name yt-formatted-string'
     ];
 
     for (const sel of selectors) {
         const el = document.querySelector(sel);
-        if (el) return el.textContent.trim();
+        if (el && el.textContent) {
+            const name = el.textContent.trim().replace(/\s+/g, ' ');
+            if (name) return name;
+        }
     }
     return null;
+}
+
+// Helper to match channel name against a pattern (substring or regex)
+function matchesPattern(pattern, channelName) {
+    if (!pattern || !channelName) return false;
+
+    // Check if pattern is a Regex (starts and ends with /)
+    if (pattern.startsWith('/') && pattern.lastIndexOf('/') > 0) {
+        const lastSlash = pattern.lastIndexOf('/');
+        const regexStr = pattern.slice(1, lastSlash);
+        const flags = pattern.slice(lastSlash + 1);
+        try {
+            // Default to case-insensitive if no flags provided
+            const regex = new RegExp(regexStr, flags || 'i');
+            return regex.test(channelName);
+        } catch (e) {
+            console.error(`[YLM] Invalid regex pattern: ${pattern}`, e);
+            // Fallback to substring matching if regex is invalid
+        }
+    }
+
+    // Default: case-insensitive substring match
+    return channelName.toLowerCase().includes(pattern.toLowerCase());
 }
 
 // Determine mode action based on settings and channel name
@@ -121,9 +160,9 @@ function getModeAction(settings, channelName) {
     if (autoEnable) return { action: ACTION.ENABLE, reason: REASON.GLOBAL };
     if (!channelName) return { action: ACTION.DISABLE, reason: REASON.NO_CHANNEL };
     
-    const lowerName = channelName.toLowerCase();
-    const inDisableList = disableChannelList.some(c => c.toLowerCase() === lowerName);
-    const inEnableList = channelList.some(c => c.toLowerCase() === lowerName);
+    // Check if any item in the list matches the channel name
+    const inDisableList = disableChannelList.some(pattern => matchesPattern(pattern, channelName));
+    const inEnableList = channelList.some(pattern => matchesPattern(pattern, channelName));
     
     if (inDisableList) return { action: ACTION.DISABLE, reason: REASON.DISABLE_LIST };
     if (inEnableList) return { action: ACTION.ENABLE, reason: REASON.ENABLE_LIST };
@@ -134,6 +173,7 @@ function getModeAction(settings, channelName) {
 function applyChannelBasedMode(btn, settings) {
     return pollChannelName((channelName) => {
         checkInterval = null;
+        if (channelName) console.log(`[YLM] Detected channel: "${channelName}"`);
         const { action, reason } = getModeAction(settings, channelName);
         applyMode(btn, action, reason, channelName);
     });

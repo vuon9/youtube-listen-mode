@@ -4,8 +4,16 @@ Love YouTube but tired of the data-heavy video stream? YouTube Listen Mode turns
 
 ✨ Key Features:
 • One-Click Toggle: Instantly switch between video and audio-only mode.
-• Auto-Enable Rulers: Set it to activate globally or only for specific channels.
-• Bandwidth Saver (NEW): Automatically drops video quality to 144p when enabled, then perfectly restores it when you’re done.
+• Auto-Enable Rules: Set it to activate globally or only for specific channels.
 • Priority Logic: Intelligent handling of your global and channel-specific preferences.
+  - #1 High: Global "Always Enable" overrides everything.
+  - #2 Normal: "Disable for Channels" overrides the enable list.
+  - #3 Low: "Enable for Channels" applies if no higher rules match.
+• Bandwidth Saver (NEW): Automatically drops video quality to 144p when enabled, then perfectly restores it when you’re done.
+• Keyword Matching Patterns (NEW): Filtering with substring and Regex support:
+  - Exact: "Lofi Girl" matches only that specific channel
+  - Prefix: Use "/^Travel/i" to match channels starting with "Travel"
+  - Suffix: " Topic" matches auto-generated "Artist - Topic" channels
+  - Advanced: Use "/(Music|Records|VEVO)$/i" to match multiple music suffixes at once
 
 Open Source & Transparent: https://github.com/vuon9/youtube-listen-mode

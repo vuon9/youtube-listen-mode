@@ -1,3 +1,4 @@
 node_modules/
 coverage/
 cucumber_report.*
+.nyc_output
