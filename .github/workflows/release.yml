@@ -21,9 +21,22 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.release_created }}
+        with:
+          ref: ${{ steps.release.outputs.tag_name }}
+
+      - name: Use Node.js
+        if: ${{ steps.release.outputs.release_created }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
       - name: Sync and Package extension
         if: ${{ steps.release.outputs.release_created }}
         run: |
+          npm install
           npm run version-sync
           zip -r extension.zip manifest.json content.js inject.js popup.js popup.html popup.css styles.css images/
 
