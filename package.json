@@ -7,9 +7,10 @@
     "type": "git",
     "url": "https://github.com/vuon9/youtube-listen-mode"
   },
-  "scripts": {
-    "test": "nyc cucumber-js --format json:cucumber_report.json && node report.js"
-  },
+    "scripts": {
+        "test": "nyc cucumber-js --format json:cucumber_report.json && node report.js",
+        "version-sync": "node scripts/sync-version.js"
+    },
   "keywords": [
     "youtube",
     "listen",
