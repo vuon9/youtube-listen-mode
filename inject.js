@@ -1,4 +1,4 @@
-(function() {
+(function () {
     console.log('[YLM] Inject script loaded');
     let previousQuality = 'default';
 
@@ -9,13 +9,19 @@
             return;
         }
 
-        console.log('[YLM] Setting quality to', quality);
+        const currentQ = typeof player.getPlaybackQuality === 'function' ? player.getPlaybackQuality() : 'unknown';
+        console.log(`[YLM] Setting quality to ${quality} (Current: ${currentQ})`);
+
+        // Avoid redundant calls if already at target quality
+        if (currentQ === quality && (quality !== 'tiny' || quality === 'unknown')) {
+            console.log('[YLM] Already at target quality, skipping redundunt update.');
+            return;
+        }
 
         // Store current quality before switching to tiny
         if (quality === 'tiny') {
-            const current = typeof player.getPlaybackQuality === 'function' ? player.getPlaybackQuality() : 'default';
-            if (current !== 'tiny' && current !== 'unknown') {
-                previousQuality = current;
+            if (currentQ !== 'tiny' && currentQ !== 'unknown') {
+                previousQuality = currentQ;
                 console.log('[YLM] Remembered previous quality:', previousQuality);
             }
         } else if (quality === 'default' && previousQuality !== 'tiny') {
@@ -25,6 +31,10 @@
         }
 
         function apply() {
+            // Re-check quality before applying in retries
+            const q = typeof player.getPlaybackQuality === 'function' ? player.getPlaybackQuality() : '';
+            if (q === quality && quality !== 'tiny') return;
+
             if (typeof player.setPlaybackQualityRange === 'function') {
                 player.setPlaybackQualityRange(quality, quality);
             }
@@ -34,17 +44,18 @@
             if (typeof player.setOption === 'function') {
                 try {
                     player.setOption('playback', 'quality', quality);
-                    player.setOption('playback-video', 'quality', quality);
                 } catch (e) {
-                    console.error('[YLM] Error in setOption', e);
+                    console.error('[YLM] Error in setoption', e);
                 }
             }
             player.dispatchEvent(new Event('onPlaybackQualityChange'));
         }
 
         apply();
-        // Retries for robustness
-        [100, 500, 1000, 2000].forEach(delay => setTimeout(apply, delay));
+        // Retries for robustness ONLY when enabling 144p (tiny) mode
+        if (quality === 'tiny') {
+            [500, 1000, 2000].forEach(delay => setTimeout(apply, delay));
+        }
     }
 
     // Listen for custom events from the content script (ISOLATED world)

@@ -1,5 +1,4 @@
-
-const { Given, When, Then } = require('@cucumber/cucumber');
+const { Given, When, Then, Before } = require('@cucumber/cucumber');
 const assert = require('assert');
 const { getPriorityMode, updateVideoQuality } = require('../../content.js');
 
@@ -10,6 +9,16 @@ let settings = {
 };
 let currentChannel = '';
 let actualMode = '';
+
+Before(function () {
+    settings = {
+        autoEnable: false,
+        channelList: [],
+        disableChannelList: []
+    };
+    currentChannel = '';
+    actualMode = '';
+});
 
 Given('global auto-enable is {string}', function (state) {
     settings.autoEnable = (state === 'ON');

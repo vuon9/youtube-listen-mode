@@ -6,59 +6,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Youtube Listen Mode Settings</title>
     <link rel="stylesheet" href="popup.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="container">
-        <div class="header">
-            <img src="images/icon48.png" alt="Logo" class="logo">
-            <h1>Youtube Listen Mode</h1>
-        </div>
-        <p class="priority-note">Higher tags override lower ones.</p>
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-group">
+                <img src="images/icon48.png" alt="Logo" class="logo">
+                <h1>YouTube Listen Mode</h1>
+            </div>
+        </header>
 
         <div class="divider"></div>
 
-        <div class="channels-section">
-            <div class="section-header">
-                <h2>Always enable for channels</h2>
-                <span class="info-circle"># Low</span>
-            </div>
-            <div class="input-group">
-                <input type="text" id="channelInput" placeholder="Add channel name...">
-                <button class="add-btn" id="addChannelBtn">Add</button>
-            </div>
-            <div id="channelList" class="tags-container">
-                <!-- Tags will be injected here -->
-            </div>
-        </div>
+        <main class="content-scroll">
+            <!-- Priority Note -->
+            <!-- <p class="priority-note">Higher tags override lower ones.</p> -->
 
-        <div class="divider"></div>
-
-        <div class="channels-section">
-            <div class="section-header">
-                <h2>Always disable for channels</h2>
-                <span class="info-circle"># Normal</span>
-            </div>
-            <div class="input-group">
-                <input type="text" id="disableChannelInput" placeholder="Add channel name...">
-                <button class="add-btn" id="addDisableChannelBtn">Add</button>
-            </div>
-            <div id="disableChannelList" class="tags-container">
-                <!-- Tags will be injected here -->
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="setting-row">
-            <label class="switch-label" for="autoEnable">
-                <div class="label-with-info">
-                    <span>Always enable listen mode</span>
-                    <span class="info-circle"># High</span>
+            <!-- Enable Section -->
+            <section class="channels-section">
+                <div class="section-badge enable">
+                    <span class="badge-icon">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                    <h2>ENABLE FOR CHANNELS</h2>
+                    <span class="priority-label">#3 Low</span>
                 </div>
+                <div class="input-card">
+                    <input type="text" id="channelInput" placeholder="Add channel name...">
+                    <button class="add-button" id="addChannelBtn" title="Add">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="channelList" class="tags-container">
+                    <!-- Tags will be injected here -->
+                </div>
+            </section>
+
+            <!-- Disable Section -->
+            <section class="channels-section">
+                <div class="section-badge disable">
+                    <span class="badge-icon">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </span>
+                    <h2>DISABLE FOR CHANNELS</h2>
+                    <span class="priority-label">#2 Normal</span>
+                </div>
+                <div class="input-card">
+                    <input type="text" id="disableChannelInput" placeholder="Add channel name...">
+                    <button class="add-button" id="addDisableChannelBtn" title="Add">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="disableChannelList" class="tags-container">
+                    <!-- Tags will be injected here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Always Enable Section -->
+        <div class="footer-action-card">
+            <div class="card-info">
+                <div class="lightning-circle">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <div class="label-text">
+                    <div class="title-with-priority">
+                        <h3>Always Enable</h3>
+                        <span class="priority-label high">#1 High</span>
+                    </div>
+                    <p>Active on all videos</p>
+                </div>
+            </div>
+            <label class="ios-switch">
                 <input type="checkbox" id="autoEnable">
-                <span class="slider"></span>
+                <span class="ios-slider"></span>
             </label>
         </div>
     </div>

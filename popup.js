@@ -12,10 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const disableChannelListContainer = document.getElementById('disableChannelList');
 
     // Load settings
-    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
-        autoEnableCheckbox.checked = result.autoEnable || false;
-        renderChannels(result.channelList || [], channelListContainer, 'channelList');
-        renderChannels(result.disableChannelList || [], disableChannelListContainer, 'disableChannelList');
+    chrome.storage.local.get({
+        autoEnable: false,
+        channelList: [' Official'],
+        disableChannelList: []
+    }, (result) => {
+        autoEnableCheckbox.checked = result.autoEnable;
+        renderChannels(result.channelList, channelListContainer, 'channelList');
+        renderChannels(result.disableChannelList, disableChannelListContainer, 'disableChannelList');
     });
 
     // Save autoEnable setting
@@ -28,11 +32,30 @@ document.addEventListener('DOMContentLoaded', () => {
     channelInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addChannel(channelInput, 'channelList', channelListContainer);
     });
+    channelInput.addEventListener('input', () => validateRegex(channelInput));
 
     addDisableChannelBtn.addEventListener('click', () => addChannel(disableChannelInput, 'disableChannelList', disableChannelListContainer));
     disableChannelInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addChannel(disableChannelInput, 'disableChannelList', disableChannelListContainer);
     });
+    disableChannelInput.addEventListener('input', () => validateRegex(disableChannelInput));
+
+    function validateRegex(input) {
+        const val = input.value.trim();
+        input.classList.remove('regex-valid', 'regex-invalid');
+        
+        if (val.startsWith('/') && val.lastIndexOf('/') > 0) {
+            const lastSlash = val.lastIndexOf('/');
+            const regexStr = val.slice(1, lastSlash);
+            const flags = val.slice(lastSlash + 1);
+            try {
+                new RegExp(regexStr, flags || 'i');
+                input.classList.add('regex-valid');
+            } catch (e) {
+                input.classList.add('regex-invalid');
+            }
+        }
+    }
 
     function addChannel(input, storageKey, container) {
         const name = input.value.trim();

@@ -18,10 +18,10 @@ This Chrome extension enhances the YouTube viewing experience by providing a sim
 
 1. **Button Injection**: MutationObserver detects YouTube player controls and injects toggle button
 2. **Mode Toggling**: Clicking button adds/removes `ytb-listen-mode-active` class to player
-3. **Auto-Enable Logic**: Priority-based system with four levels:
-   - Global auto-enable (highest priority)
-   - Disable list (channel-specific override)
-   - Enable list (channel-specific enable)
+3. **Auto-Enable Logic**: Priority-based system with smart pattern matching and visible UI labels:
+   - #1 High: Global auto-enable (highest priority)
+   - #2 Normal: Disable list (channel-specific override)
+   - #3 Low: Enable list (channel-specific enable)
    - Default disabled (strict force mode)
 4. **Channel Detection**: Polling mechanism to extract channel name from YouTube DOM
 
@@ -118,8 +118,8 @@ Runs Cucumber tests with code coverage reporting via nyc.
 Ensure tests cover all priority levels:
 
 - Global auto-enable ON/OFF
-- Channel in disable list
-- Channel in enable list
+- Channel in disable list (Substring & Regex)
+- Channel in enable list (Substring & Regex)
 - Channel not in any list
 - Channel name not found (timeout)
 
@@ -136,7 +136,7 @@ Ensure tests cover all priority levels:
 
 - Use `chrome.storage.local` for user settings
 - Settings structure: `{ autoEnable, channelList, disableChannelList }`
-- Default values: `false`, `[]`, `[]`
+- Default values: `false`, `[" Official"]`, `[]`
 
 ### Content Script Safety
 
@@ -208,5 +208,5 @@ const REASON = {
 - [YouTube Player API](https://developers.google.com/youtube/iframe_api_reference)
 
 ---
-*Last Updated: Jan 22 2026*
+*Last Updated: March 22 2026*
 *Maintainer: AI Development Guidelines*
