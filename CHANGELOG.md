@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.2](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.1...v1.11.2) (2026-03-22)
+
+
+### Bug Fixes
+
+* glitch of quality change when toggle listen mode on video ([ffe1439](https://github.com/vuon9/youtube-listen-mode/commit/ffe14399360f62e243aa6ac7f8c9fd1f01a483ec))
+
 ## [1.11.1](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.0...v1.11.1) (2026-03-22)
 
 
