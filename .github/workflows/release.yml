@@ -20,3 +20,15 @@ jobs:
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync and Package extension
+        if: ${{ steps.release.outputs.release_created }}
+        run: |
+          npm run version-sync
+          zip -r extension.zip manifest.json content.js inject.js popup.js popup.html popup.css styles.css images/
+
+      - name: Upload Release Asset
+        if: ${{ steps.release.outputs.release_created }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ steps.release.outputs.tag_name }} extension.zip --clobber

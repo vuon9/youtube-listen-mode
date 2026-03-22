@@ -5,6 +5,11 @@ env:
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish (e.g. v1.7.1)'
+        required: true
+        default: 'latest'
 
 jobs:
   publish:
@@ -12,20 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Sync manifest version
-        run: npm run version-sync
-
-      - name: Package extension
-        run: zip -r extension.zip manifest.json content.js inject.js popup.js popup.html popup.css styles.css images/
+      - name: Download Release Asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.tag }}" = "latest" ]; then
+            gh release download --pattern "*.zip" --clobber
+          else
+            gh release download ${{ github.event.inputs.tag }} --pattern "*.zip" --clobber
+          fi
+          mv *.zip extension.zip
 
       - name: Publish to Chrome Web Store
         run: npx chrome-webstore-upload-cli@3 upload --source extension.zip --auto-publish --extensionId ${EXTENSION_ID}
