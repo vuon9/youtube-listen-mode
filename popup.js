@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load settings
     chrome.storage.local.get({
         autoEnable: false,
-        channelList: [' Official'],
+        channelList: [],
         disableChannelList: []
     }, (result) => {
         autoEnableCheckbox.checked = result.autoEnable;
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function validateRegex(input) {
         const val = input.value.trim();
         input.classList.remove('regex-valid', 'regex-invalid');
-        
+
         if (val.startsWith('/') && val.lastIndexOf('/') > 0) {
             const lastSlash = val.lastIndexOf('/');
             const regexStr = val.slice(1, lastSlash);
