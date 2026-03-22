@@ -21,7 +21,7 @@ jobs:
           node-version: "20"
           cache: "npm"
       - run: npm install
-      - run: npm test && npm test-report
+      - run: npm test && npm run test-report
       - name: Coverage Report
         if: always()
         run: |
