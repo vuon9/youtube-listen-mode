@@ -1,6 +1,7 @@
 (function () {
     console.log('[YLM] Inject script loaded');
     let previousQuality = 'default';
+    let currentTargetQuality = null;
 
     function updateQuality(quality) {
         const player = document.getElementById('movie_player') || document.querySelector('.html5-video-player');
@@ -30,7 +31,12 @@
             quality = previousQuality;
         }
 
+        currentTargetQuality = quality;
+
         function apply() {
+            // Prevent old retries from overriding newer requests
+            if (currentTargetQuality !== quality) return;
+
             // Re-check quality before applying in retries
             const q = typeof player.getPlaybackQuality === 'function' ? player.getPlaybackQuality() : '';
             if (q === quality && quality !== 'tiny') return;
