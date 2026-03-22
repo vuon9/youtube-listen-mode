@@ -18,16 +18,6 @@ A lightweight Chrome extension that turns watching Youtube video into **audio‑
 | **Auto-enable logic** | Intelligent priority-based handling: <br /> 1. **Global Always Enable** (Highest) <br /> 2. **Disable for Channels** (Overrides enable list) <br /> 3. **Enable for Channels** (Lowest) |
 <!-- markdownlint-enable MD033 -->
 
-## Screenshots
-
-Extension settings:
-
-![Extension settings](https://github.com/user-attachments/assets/60aa6107-5b57-4abd-9cc2-98989ab7beea)
-
-Audio Mode:
-
-![ytb-listen-mode](./screenshots/ytb.png)
-
 ## 📖 Documentation
 
 Check out the following guides to learn more about developing and maintaining this project:
