@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.8.0...v1.9.0) (2026-03-22)
+
+
+### Features
+
+* Update README with new feature highlights ([054c184](https://github.com/vuon9/youtube-listen-mode/commit/054c184ef8ef0f66a7d88f53c159edc5a9d471e1))
+
 ## [1.8.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.7.0...v1.8.0) (2026-03-22)
 
 
