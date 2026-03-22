@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.5.0...v1.6.0) (2026-03-22)
+
+
+### Features
+
+* revamp ui & advancing keyword filtering ([#24](https://github.com/vuon9/youtube-listen-mode/issues/24)) ([f2d9563](https://github.com/vuon9/youtube-listen-mode/commit/f2d956314238942b8e644e9dc83aac8f7b7f4cc5))
+
 ## [1.5.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.4.3...v1.5.0) (2026-03-21)
 
 
