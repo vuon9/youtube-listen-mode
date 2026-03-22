@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.11.1](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.0...v1.11.1) (2026-03-22)
+
+
+### Bug Fixes
+
+* release should depend on run tests completed and fix the test report ([ea13ecc](https://github.com/vuon9/youtube-listen-mode/commit/ea13eccd08960dd18e80de59cc8e146fbc8d5a55))
+* remove default Official channel ([9556764](https://github.com/vuon9/youtube-listen-mode/commit/955676452bf49a3756edb58ff13c80378e270134))
+* try to fix tests again ([c507704](https://github.com/vuon9/youtube-listen-mode/commit/c5077040eecdf1595fab05d9dc4a1f3014ed8770))
+* try to fix tests again ([3a086e5](https://github.com/vuon9/youtube-listen-mode/commit/3a086e527660a6db6e09dd0b33f52b826bac751e))
+
 ## [1.11.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.10.0...v1.11.0) (2026-03-22)
 
 
