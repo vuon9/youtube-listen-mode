@@ -145,7 +145,7 @@ function matchesPattern(pattern, channelName) {
             const regex = new RegExp(regexStr, flags || 'i');
             return regex.test(channelName);
         } catch (e) {
-            console.error(`[YLM] Invalid regex pattern: ${pattern}`, e);
+            console.warn(`[YLM] Invalid regex pattern: ${pattern}. Falling back to substring match.`);
             // Fallback to substring matching if regex is invalid
         }
     }
@@ -290,6 +290,14 @@ function init() {
     window.addEventListener('yt-navigate-finish', () => {
         const btn = document.querySelector('.ytb-listen-mode-btn');
         if (btn) {
+            // Clean up old state from previous video to prevent false toggle events
+            const player = document.querySelector('.html5-video-player');
+            if (player) {
+                player.classList.remove('ytb-listen-mode-active');
+                player.querySelector('.ytb-listen-mode-overlay')?.remove();
+                btn.innerHTML = SVG_HEADPHONES;
+                btn.title = "Enable Listen Mode";
+            }
             checkSettingsAndApply(btn);
         }
     });

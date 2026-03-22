@@ -12,7 +12,7 @@
         "*://*.youtube.com/*"
     ],
     "action": {
-        "default_popup": "popup.html",
+        "default_popup": "src/popup.html",
         "default_icon": {
             "16": "images/icon16.png",
             "32": "images/icon32.png",
@@ -26,10 +26,10 @@
                 "*://*.youtube.com/*"
             ],
             "js": [
-                "content.js"
+                "src/content.js"
             ],
             "css": [
-                "styles.css"
+                "src/styles.css"
             ],
             "run_at": "document_idle"
         },
@@ -38,7 +38,7 @@
                 "*://*.youtube.com/*"
             ],
             "js": [
-                "inject.js"
+                "src/inject.js"
             ],
             "world": "MAIN",
             "run_at": "document_start"

@@ -3,3 +3,6 @@ coverage/
 cucumber_report.*
 .nyc_output
 **/*/.DS_Store
+extension
+extension.zip
+.DS_Store

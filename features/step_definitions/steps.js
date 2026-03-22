@@ -1,6 +1,24 @@
 const { Given, When, Then, Before } = require('@cucumber/cucumber');
 const assert = require('assert');
-const { getPriorityMode, updateVideoQuality } = require('../../content.js');
+const { getPriorityMode, updateVideoQuality } = require('../../src/content.js');
+
+// Mock console methods to suppress [YLM] logs during testing
+const originalLog = console.log;
+const originalWarn = console.warn;
+const originalError = console.error;
+
+console.log = (...args) => {
+    if (typeof args[0] === 'string' && args[0].includes('[YLM]')) return;
+    originalLog(...args);
+};
+console.warn = (...args) => {
+    if (typeof args[0] === 'string' && args[0].includes('[YLM]')) return;
+    originalWarn(...args);
+};
+console.error = (...args) => {
+    if (typeof args[0] === 'string' && args[0].includes('[YLM]')) return;
+    originalError(...args);
+};
 
 let settings = {
     autoEnable: false,

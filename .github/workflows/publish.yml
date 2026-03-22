@@ -7,16 +7,16 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to publish (e.g. v1.7.1)'
+        description: "Tag to publish (e.g. v1.7.1)"
         required: true
-        default: 'latest'
+        default: "latest"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Download Release Asset
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

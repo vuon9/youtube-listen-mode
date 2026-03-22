@@ -38,7 +38,7 @@ jobs:
         run: |
           npm install
           npm run version-sync
-          zip -r extension.zip manifest.json content.js inject.js popup.js popup.html popup.css styles.css images/
+          zip -r extension.zip manifest.json src/ images/
 
       - name: Upload Release Asset
         if: ${{ steps.release.outputs.release_created }}
