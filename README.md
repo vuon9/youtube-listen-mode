@@ -2,6 +2,7 @@
 
 A lightweight Chrome extension that turns watching Youtube video into **audio‑only mode**.
 
+![CI](https://img.shields.io/github/actions/workflow/status/vuon9/youtube-listen-mode/ci.yml?style=for-the-badge&logo=google-chrome&logoColor=white)
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/youtube-listen-mode/pbhfgfcljjildhfdglggpjnahaclpdcj)
 
 ---
