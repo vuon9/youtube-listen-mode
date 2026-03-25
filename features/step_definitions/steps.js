@@ -1,6 +1,6 @@
 const { Given, When, Then, Before } = require('@cucumber/cucumber');
 const assert = require('assert');
-const { getPriorityMode, updateVideoQuality } = require('../../src/content.js');
+const { getPriorityMode, updateVideoQuality, disableAudioMode, _createMockButton } = require('../../src/content.js');
 
 // Mock console methods to suppress [YLM] logs during testing
 const originalLog = console.log;
@@ -133,4 +133,35 @@ Then('the video quality should be set to {string}', function (expectedQuality) {
 
 Then('the video quality should be restored to {string}', function (expectedQuality) {
     assert.strictEqual(lastQualitySet, expectedQuality);
+});
+
+// Cross-tab quality restoration test steps
+Given('listen mode has never been active on this page', function () {
+    // Reset quality tracking and simulated previous quality
+    lastQualitySet = '';
+    simulatedPreviousQuality = 'default';
+    // Mock player without listen mode active class
+    const mockPlayerNotActive = {
+        classList: {
+            contains: (cls) => cls !== 'ytb-listen-mode-active', // Never active
+            remove: () => {},
+            add: () => {}
+        },
+        querySelector: () => null
+    };
+    global.document = {
+        querySelector: (sel) => {
+            if (sel === '.html5-video-player') return mockPlayerNotActive;
+            return null;
+        }
+    };
+});
+
+When('listen mode should be disabled', function () {
+    const mockBtn = _createMockButton();
+    disableAudioMode(mockBtn);
+});
+
+Then('video quality should be restored to default', function () {
+    assert.strictEqual(lastQualitySet, 'default', 'Quality should be restored to default even when listen mode was never active');
 });

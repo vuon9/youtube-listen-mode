@@ -235,9 +235,26 @@ function enableAudioMode(btn) {
 
 function disableAudioMode(btn) {
     const player = document.querySelector('.html5-video-player');
-    if (!player || !player.classList.contains('ytb-listen-mode-active')) return;
+    if (!player) return;
 
-    toggleMode(btn);
+    const wasActive = player.classList.contains('ytb-listen-mode-active');
+
+    // Remove UI state if active
+    if (wasActive) {
+        player.classList.remove('ytb-listen-mode-active');
+        btn.innerHTML = SVG_HEADPHONES;
+        btn.title = "Enable Listen Mode";
+        player.querySelector('.ytb-listen-mode-overlay')?.remove();
+    }
+
+    // Always restore quality when mode should be disabled
+    // This fixes the cross-tab quality persistence bug
+    if (wasActive) {
+        console.log('[YLM] Restoring video quality after disabling listen mode');
+    } else {
+        console.log('[YLM] Ensuring video quality is restored (listen mode not active)');
+    }
+    updateVideoQuality(false);
 }
 
 function applyMode(btn, action, reason, channelName) {
@@ -318,6 +335,12 @@ if (typeof module !== 'undefined') {
             const { action } = getModeAction(settings, channelName);
             return action === ACTION.ENABLE ? 'ENABLED' : 'DISABLED';
         },
-        updateVideoQuality: updateVideoQuality 
+        updateVideoQuality: updateVideoQuality,
+        disableAudioMode: disableAudioMode,
+        // Exposed for testing: mock button for testing disableAudioMode
+        _createMockButton: () => ({
+            innerHTML: '',
+            title: ''
+        })
     };
 }

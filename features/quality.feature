@@ -12,3 +12,8 @@ Feature: Video Quality Control
     And Listen Mode is being enabled
     When Listen Mode is being disabled
     Then the video quality should be restored to "hd720"
+
+  Scenario: Quality is restored when listen mode should be disabled even if never active
+    Given listen mode has never been active on this page
+    When listen mode should be disabled
+    Then video quality should be restored to default

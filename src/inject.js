@@ -25,10 +25,17 @@
                 previousQuality = currentQ;
                 console.log('[YLM] Remembered previous quality:', previousQuality);
             }
-        } else if (quality === 'default' && previousQuality !== 'tiny') {
-            // Restore to previous quality instead of just default
-            console.log('[YLM] Restoring to previous quality:', previousQuality);
-            quality = previousQuality;
+        } else if (quality === 'default') {
+            // Restore to previous quality or 'auto' if never set
+            if (previousQuality === 'default') {
+                // Never recorded a quality, use 'auto' to let YouTube decide
+                console.log('[YLM] No previous quality recorded, using auto');
+                quality = 'auto';
+            } else if (previousQuality !== 'tiny') {
+                // Use the recorded previous quality
+                console.log('[YLM] Restoring to previous quality:', previousQuality);
+                quality = previousQuality;
+            }
         }
 
         currentTargetQuality = quality;
@@ -71,9 +78,34 @@
             updateQuality(quality);
         }
     });
+
     // Reset previous quality on navigation to ensure we capture the fresh quality for the next video
     window.addEventListener('yt-navigate-finish', () => {
         previousQuality = 'default';
         console.log('[YLM] Reset previous quality due to navigation');
+
+        // Early quality restoration: try to restore quality to auto immediately
+        // This prevents videos from starting at low quality when listen mode was enabled in another tab
+        // If listen mode should be enabled, content.js will dispatch 'tiny' which overrides this
+        function restoreToAuto() {
+            const player = document.getElementById('movie_player') || document.querySelector('.html5-video-player');
+            if (!player) return false;
+
+            const currentQ = typeof player.getPlaybackQuality === 'function' ? player.getPlaybackQuality() : 'unknown';
+            // Only restore if currently at 'tiny' (was set by listen mode in another tab)
+            if (currentQ === 'tiny') {
+                console.log('[YLM] Early restoration: resetting low quality to auto');
+                updateQuality('default'); // 'default' becomes 'auto' in updateQuality
+                return true;
+            }
+            return false;
+        }
+
+        // Try immediately, then with retries if player isn't ready
+        if (!restoreToAuto()) {
+            [100, 300, 500, 1000, 2000].forEach(delay => {
+                setTimeout(() => restoreToAuto(), delay);
+            });
+        }
     });
 })();

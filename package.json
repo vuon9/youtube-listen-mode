@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "nyc cucumber-js --format json:cucumber_report.json && node ops/cucumber-report.js",
-    "version-sync": "node ops/sync-version.js"
+    "version-sync": "node ops/sync-version.js",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "keywords": [
     "youtube",
@@ -20,6 +21,8 @@
   "author": "Vuong",
   "license": "MIT",
   "devDependencies": {
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
     "@cucumber/cucumber": "^12.5.0",
     "cucumber-html-reporter": "^6.0.0",
     "jest": "^30.2.0",
