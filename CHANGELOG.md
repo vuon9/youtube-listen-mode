@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.11.3](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.2...v1.11.3) (2026-03-27)
+
+
+### Bug Fixes
+
+* badge links in README.md ([42be84d](https://github.com/vuon9/youtube-listen-mode/commit/42be84d7f09a7dc6956deef5a31dfae2e4c6c62a))
+* remove commit lint ([ba33da9](https://github.com/vuon9/youtube-listen-mode/commit/ba33da951df2c2ec6921f03cb4880abcec6a3d9b))
+* restore video quality when listen mode should be disabled ([6b13373](https://github.com/vuon9/youtube-listen-mode/commit/6b13373f982292f8b1020a222dbee49d0a846a1f))
+
 ## [1.11.2](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.1...v1.11.2) (2026-03-22)
 
 
