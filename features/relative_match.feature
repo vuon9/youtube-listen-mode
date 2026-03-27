@@ -33,6 +33,17 @@ Feature: Substring Matching for Channel Names
     When I check the mode for "Official Artist"
     Then the mode should be "DISABLED"
 
+  Scenario: Match music labels ending with Music, Records, or VEVO
+    Given "/(Music|Records|VEVO)$/i" is in the "Always Enable" list
+    When I check the mode for "Universal Music"
+    Then the mode should be "ENABLED"
+    When I check the mode for "Sony Records"
+    Then the mode should be "ENABLED"
+    When I check the mode for "Taylor Swift VEVO"
+    Then the mode should be "ENABLED"
+    When I check the mode for "Music Channel"
+    Then the mode should be "DISABLED"
+
   Scenario: Invalid regex falls back to substring
     Given "/[invalid/" is in the "Always Enable" list
     When I check the mode for "Test /[invalid/"
