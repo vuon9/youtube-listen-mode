@@ -207,6 +207,41 @@ const REASON = {
 - [Cucumber.js Documentation](https://cucumber.io/docs/installation/javascript/)
 - [YouTube Player API](https://developers.google.com/youtube/iframe_api_reference)
 
+## Commit Messages
+
+This project uses **Conventional Commits** format. See `.github/copilot-instructions.md` for quick reference.
+
+### Format
+
+```
+<type>: <description>
+```
+
+### Types (lowercase)
+
+| Type | Use for |
+|------|---------|
+| `feat:` | New features |
+| `fix:` | Bug fixes |
+| `docs:` | Documentation changes |
+| `chore:` | Maintenance, dependencies, tooling |
+
+### Rules
+
+- Use **lowercase** for type: `fix:` not `Fix:`
+- Keep description under 72 characters
+- Use **imperative mood**: "add" not "added"
+- No period at the end
+
+### Examples
+
+```
+fix: restore video quality when listen mode disabled
+feat: add regex pattern matching for channel names
+docs: update README with installation instructions
+chore: add commitlint validation for PR commits
+```
+
 ---
 *Last Updated: March 22 2026*
 *Maintainer: AI Development Guidelines*
