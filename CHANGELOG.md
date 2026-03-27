@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.11.4](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.3...v1.11.4) (2026-03-27)
+
+
+### Bug Fixes
+
+* regex in Smart Channel Matching description ([47d9552](https://github.com/vuon9/youtube-listen-mode/commit/47d955255d87020723033eb034697380a1adae1e))
+* regex in Smart Channel Matching section ([c77b6fd](https://github.com/vuon9/youtube-listen-mode/commit/c77b6fd7064d86f97d335638d5e947733cf9dbad))
+* regex syntax in markdown table ([2d5b29d](https://github.com/vuon9/youtube-listen-mode/commit/2d5b29db2b83679f2eb5fee912383f3afda4ef9c))
+
 ## [1.11.3](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.2...v1.11.3) (2026-03-27)
 
 
