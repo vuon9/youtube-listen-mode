@@ -102,24 +102,9 @@ function toggleMode(btn) {
 function getChannelName() {
   if (typeof document === 'undefined') return null;
 
-  // Try reliable metadata first
-  const metaAuthor =
-    document.querySelector('[itemprop="author"] [itemprop="name"]') ||
-    document.querySelector('[itemprop="author"] link[itemprop="name"]');
-  if (metaAuthor) {
-    const name = metaAuthor.getAttribute('content') || metaAuthor.textContent;
-    if (name) return name.trim().replace(/\s+/g, ' ');
-  }
-
   // Modern YouTube selectors
   const selectors = [
-    '#upload-info #channel-name a',
-    'ytd-video-owner-renderer #channel-name a',
-    'ytd-video-owner-renderer #owner-name a',
-    '#owner #channel-name a',
-    '.ytd-channel-name a',
-    '#channel-name yt-formatted-string',
-    '#owner-name yt-formatted-string',
+    '.ytd-channel-name .yt-formatted-string',
   ];
 
   for (const sel of selectors) {
