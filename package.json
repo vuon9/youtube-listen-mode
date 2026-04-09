@@ -10,17 +10,19 @@
   "scripts": {
     "test": "nyc cucumber-js --format json:cucumber_report.json && node ops/cucumber-report.js",
     "version-sync": "node ops/sync-version.js",
-    "prepare": "git config core.hooksPath .githooks"
+    "prepare": "git config core.hooksPath .githooks",
+    "format": "biome format --write",
+    "format:check": "biome format",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write",
+    "check": "biome check",
+    "check:fix": "biome check --write"
   },
-  "keywords": [
-    "youtube",
-    "listen",
-    "chrome",
-    "extension"
-  ],
+  "keywords": ["youtube", "listen", "chrome", "extension"],
   "author": "Vuong",
   "license": "MIT",
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "@cucumber/cucumber": "^12.5.0",
