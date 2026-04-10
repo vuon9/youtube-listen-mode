@@ -29,8 +29,10 @@ let settings = {
   autoEnable: false,
   channelList: [],
   disableChannelList: [],
+  titleKeywordList: [],
 };
 let currentChannel = '';
+let currentTitle = '';
 let actualMode = '';
 
 Before(function () {
@@ -38,8 +40,10 @@ Before(function () {
     autoEnable: false,
     channelList: [],
     disableChannelList: [],
+    titleKeywordList: [],
   };
   currentChannel = '';
+  currentTitle = '';
   actualMode = '';
 });
 
@@ -62,7 +66,7 @@ Given('{string} is not in any list', function (channel) {
 
 When('I check the mode for {string}', function (channel) {
   currentChannel = channel;
-  actualMode = getPriorityMode(currentChannel, settings);
+  actualMode = getPriorityMode(currentChannel, currentTitle, settings);
 });
 
 Then('the mode should be {string}', function (expectedMode) {
@@ -177,4 +181,21 @@ Then('video quality should be restored to default', function () {
     'default',
     'Quality should be restored to default even when listen mode was never active'
   );
+});
+
+// Title Keyword Steps
+Given('I have added {string} to title keywords', function (keyword) {
+  settings.titleKeywordList.push(keyword);
+});
+
+When('I check the mode for channel {string} with title {string}', function (channel, title) {
+  currentChannel = channel;
+  currentTitle = title;
+  actualMode = getPriorityMode(currentChannel, currentTitle, settings);
+});
+
+When('I check the mode for a video with title {string}', function (title) {
+  currentChannel = 'SomeChannel';
+  currentTitle = title;
+  actualMode = getPriorityMode(currentChannel, currentTitle, settings);
 });
