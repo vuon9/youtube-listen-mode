@@ -7,3 +7,5 @@ extension
 extension.zip
 .DS_Store
 docs/plans/
+.superpowers/
+docs/superpowers/

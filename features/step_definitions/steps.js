@@ -31,6 +31,7 @@ let settings = {
   disableChannelList: [],
 };
 let currentChannel = '';
+let currentTitle = '';
 let actualMode = '';
 
 Before(function () {
@@ -40,6 +41,7 @@ Before(function () {
     disableChannelList: [],
   };
   currentChannel = '';
+  currentTitle = '';
   actualMode = '';
 });
 
@@ -51,18 +53,20 @@ Given('{string} is in the {string} list', function (channel, listType) {
   if (listType === 'Always Disable') {
     settings.disableChannelList.push(channel);
   } else {
-    settings.channelList.push(channel);
+    settings.channelList.push({ pattern: channel, matchTitle: true });
   }
 });
 
 Given('{string} is not in any list', function (channel) {
-  settings.channelList = settings.channelList.filter((c) => c !== channel);
+  settings.channelList = settings.channelList.filter(
+    (c) => c.pattern !== channel
+  );
   settings.disableChannelList = settings.disableChannelList.filter((c) => c !== channel);
 });
 
 When('I check the mode for {string}', function (channel) {
   currentChannel = channel;
-  actualMode = getPriorityMode(currentChannel, settings);
+  actualMode = getPriorityMode(currentChannel, currentTitle, settings);
 });
 
 Then('the mode should be {string}', function (expectedMode) {
@@ -177,4 +181,25 @@ Then('video quality should be restored to default', function () {
     'default',
     'Quality should be restored to default even when listen mode was never active'
   );
+});
+
+// Title Match Steps
+Given('I have added {string} to title keywords', function (keyword) {
+  settings.channelList.push({ pattern: keyword, matchTitle: true });
+});
+
+Given('I have added {string} as channel-only keyword', function (keyword) {
+  settings.channelList.push({ pattern: keyword, matchTitle: false });
+});
+
+When('I check the mode for channel {string} with title {string}', function (channel, title) {
+  currentChannel = channel;
+  currentTitle = title;
+  actualMode = getPriorityMode(currentChannel, currentTitle, settings);
+});
+
+When('I check the mode for a video with title {string}', function (title) {
+  currentChannel = 'SomeChannel';
+  currentTitle = title;
+  actualMode = getPriorityMode(currentChannel, currentTitle, settings);
 });
