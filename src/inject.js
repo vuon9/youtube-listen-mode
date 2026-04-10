@@ -1,4 +1,4 @@
-(function () {
+(() => {
   console.log('[YLM] Inject script loaded');
   let previousQuality = 'default';
   let currentTargetQuality = null;

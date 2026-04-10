@@ -6,25 +6,24 @@ Feature: Title Keyword Matching for Auto-Enable
   Background:
     Given global auto-enable is "OFF"
 
-  Scenario: Title keyword triggers listen mode enable
+  Scenario: Keyword with matchTitle ON triggers on title
     Given I have added "podcast" to title keywords
     When I check the mode for channel "RandomChannel" with title "Best Podcast Episode 123"
     Then the mode should be "ENABLED"
 
-  Scenario: Regex pattern in title triggers enable
+  Scenario: Regex pattern with matchTitle ON triggers on title
     Given I have added "/(Audio|Lyrics)/i" to title keywords
     When I check the mode for channel "RandomChannel" with title "Song Title (Audio)"
     Then the mode should be "ENABLED"
 
-  Scenario: Title keyword does not match
-    Given I have added "podcast" to title keywords
-    When I check the mode for channel "RandomChannel" with title "Tutorial: How to Code"
+  Scenario: Keyword with matchTitle OFF does not trigger on title
+    Given I have added "podcast" as channel-only keyword
+    When I check the mode for channel "RandomChannel" with title "Best Podcast Episode 123"
     Then the mode should be "DISABLED"
 
-  Scenario: Channel match takes precedence over title match reason
-    Given "Lofi Girl" is in the "Always Enable" list
-    And I have added "podcast" to title keywords
-    When I check the mode for channel "Lofi Girl" with title "Best Podcast Episode"
+  Scenario: Keyword with matchTitle ON also matches channel name
+    Given I have added "Lofi Girl" to title keywords
+    When I check the mode for channel "Lofi Girl" with title "Ambient Stream"
     Then the mode should be "ENABLED"
 
   Scenario: Disable list overrides title match
@@ -32,9 +31,3 @@ Feature: Title Keyword Matching for Auto-Enable
     And I have added "podcast" to title keywords
     When I check the mode for channel "Marques Brownlee" with title "WVFRM Podcast Episode"
     Then the mode should be "DISABLED"
-
-  Scenario: Channel OR title match enables listen mode
-    Given I have added "podcast" to title keywords
-    And "Lofi Girl" is in the "Always Enable" list
-    When I check the mode for channel "Lofi Girl" with title "Ambient Stream"
-    Then the mode should be "ENABLED"

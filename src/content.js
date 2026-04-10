@@ -163,7 +163,7 @@ function matchesPattern(pattern, channelName) {
 
 // Determine mode action based on settings, channel name, and video title
 function getModeAction(settings, channelName, videoTitle) {
-  const { autoEnable, channelList, disableChannelList, titleKeywordList } = settings;
+  const { autoEnable, channelList, disableChannelList } = settings;
   if (autoEnable) return { action: ACTION.ENABLE, reason: REASON.GLOBAL };
   if (!channelName) return { action: ACTION.DISABLE, reason: REASON.NO_CHANNEL };
 
@@ -171,14 +171,15 @@ function getModeAction(settings, channelName, videoTitle) {
   const inDisableList = disableChannelList.some((pattern) => matchesPattern(pattern, channelName));
   if (inDisableList) return { action: ACTION.DISABLE, reason: REASON.DISABLE_LIST };
 
-  // Check enable conditions (channel OR title)
-  const inEnableList = channelList.some((pattern) => matchesPattern(pattern, channelName));
-  const titleMatches = titleKeywordList?.some((pattern) =>
-    matchesPattern(pattern, videoTitle || '')
-  );
-
-  if (inEnableList) return { action: ACTION.ENABLE, reason: REASON.ENABLE_LIST };
-  if (titleMatches) return { action: ACTION.ENABLE, reason: REASON.TITLE_MATCH };
+  // Check enable conditions (channel match, or title match if matchTitle is on)
+  for (const item of channelList) {
+    if (matchesPattern(item.pattern, channelName)) {
+      return { action: ACTION.ENABLE, reason: REASON.ENABLE_LIST };
+    }
+    if (item.matchTitle && matchesPattern(item.pattern, videoTitle || '')) {
+      return { action: ACTION.ENABLE, reason: REASON.TITLE_MATCH };
+    }
+  }
 
   return { action: ACTION.DISABLE, reason: REASON.DEFAULT };
 }
@@ -228,24 +229,20 @@ function checkSettingsAndApply(btn) {
       checkInterval = null;
     }
 
-    chrome.storage.local.get(
-      ['autoEnable', 'channelList', 'disableChannelList', 'titleKeywordList'],
-      (result) => {
-        const settings = {
-          autoEnable: result.autoEnable || false,
-          channelList: result.channelList || [],
-          disableChannelList: result.disableChannelList || [],
-          titleKeywordList: result.titleKeywordList || [],
-        };
+    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
+      const settings = {
+        autoEnable: result.autoEnable || false,
+        channelList: result.channelList || [],
+        disableChannelList: result.disableChannelList || [],
+      };
 
-        if (settings.autoEnable) {
-          applyMode(btn, ACTION.ENABLE, REASON.GLOBAL, null);
-          return;
-        }
-
-        checkInterval = applyChannelBasedMode(btn, settings);
+      if (settings.autoEnable) {
+        applyMode(btn, ACTION.ENABLE, REASON.GLOBAL, null);
+        return;
       }
-    );
+
+      checkInterval = applyChannelBasedMode(btn, settings);
+    });
   }, 250);
 }
 function enableAudioMode(btn) {
@@ -388,13 +385,25 @@ function quickAddChannel(storageKey, listName) {
 
   chrome.storage.local.get([storageKey], (result) => {
     const channels = result[storageKey] || [];
-    const exists = channels.some((c) => c.toLowerCase() === channelName.toLowerCase());
-    if (exists) {
-      showToast(`${channelName} already in ${listName} list`);
-      return;
+
+    if (storageKey === 'channelList') {
+      const exists = channels.some((c) => c.pattern?.toLowerCase() === channelName.toLowerCase());
+      if (exists) {
+        showToast(`${channelName} already in ${listName} list`);
+        return;
+      }
+      channels.push({ pattern: channelName, matchTitle: true });
+    } else {
+      const exists = channels.some(
+        (c) => (typeof c === 'string' ? c : c.pattern).toLowerCase() === channelName.toLowerCase()
+      );
+      if (exists) {
+        showToast(`${channelName} already in ${listName} list`);
+        return;
+      }
+      channels.push(channelName);
     }
 
-    channels.push(channelName);
     chrome.storage.local.set({ [storageKey]: channels }, () => {
       showToast(`Added ${channelName} to ${listName} list ✓`);
     });

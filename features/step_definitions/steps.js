@@ -29,7 +29,6 @@ let settings = {
   autoEnable: false,
   channelList: [],
   disableChannelList: [],
-  titleKeywordList: [],
 };
 let currentChannel = '';
 let currentTitle = '';
@@ -40,7 +39,6 @@ Before(function () {
     autoEnable: false,
     channelList: [],
     disableChannelList: [],
-    titleKeywordList: [],
   };
   currentChannel = '';
   currentTitle = '';
@@ -55,12 +53,14 @@ Given('{string} is in the {string} list', function (channel, listType) {
   if (listType === 'Always Disable') {
     settings.disableChannelList.push(channel);
   } else {
-    settings.channelList.push(channel);
+    settings.channelList.push({ pattern: channel, matchTitle: true });
   }
 });
 
 Given('{string} is not in any list', function (channel) {
-  settings.channelList = settings.channelList.filter((c) => c !== channel);
+  settings.channelList = settings.channelList.filter(
+    (c) => c.pattern !== channel
+  );
   settings.disableChannelList = settings.disableChannelList.filter((c) => c !== channel);
 });
 
@@ -183,9 +183,13 @@ Then('video quality should be restored to default', function () {
   );
 });
 
-// Title Keyword Steps
+// Title Match Steps
 Given('I have added {string} to title keywords', function (keyword) {
-  settings.titleKeywordList.push(keyword);
+  settings.channelList.push({ pattern: keyword, matchTitle: true });
+});
+
+Given('I have added {string} as channel-only keyword', function (keyword) {
+  settings.channelList.push({ pattern: keyword, matchTitle: false });
 });
 
 When('I check the mode for channel {string} with title {string}', function (channel, title) {
