@@ -441,4 +441,19 @@ input:checked + .ios-slider:before {
   color: var(--text-secondary);
   margin-top: 2px;
   line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.title-toggle-hint .title-toggle {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  line-height: 1;
+  background: #166534;
+  color: #fff;
+  border: 1px solid #166534;
+  cursor: default;
 }
