@@ -104,9 +104,7 @@ function getChannelName() {
   if (typeof document === 'undefined') return null;
 
   // Modern YouTube selectors
-  const selectors = [
-    '.ytd-channel-name .yt-formatted-string',
-  ];
+  const selectors = ['.ytd-channel-name .yt-formatted-string'];
 
   for (const sel of selectors) {
     const el = document.querySelector(sel);
@@ -175,7 +173,9 @@ function getModeAction(settings, channelName, videoTitle) {
 
   // Check enable conditions (channel OR title)
   const inEnableList = channelList.some((pattern) => matchesPattern(pattern, channelName));
-  const titleMatches = titleKeywordList?.some((pattern) => matchesPattern(pattern, videoTitle || ''));
+  const titleMatches = titleKeywordList?.some((pattern) =>
+    matchesPattern(pattern, videoTitle || '')
+  );
 
   if (inEnableList) return { action: ACTION.ENABLE, reason: REASON.ENABLE_LIST };
   if (titleMatches) return { action: ACTION.ENABLE, reason: REASON.TITLE_MATCH };
@@ -228,21 +228,24 @@ function checkSettingsAndApply(btn) {
       checkInterval = null;
     }
 
-    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList', 'titleKeywordList'], (result) => {
-      const settings = {
-        autoEnable: result.autoEnable || false,
-        channelList: result.channelList || [],
-        disableChannelList: result.disableChannelList || [],
-        titleKeywordList: result.titleKeywordList || [],
-      };
+    chrome.storage.local.get(
+      ['autoEnable', 'channelList', 'disableChannelList', 'titleKeywordList'],
+      (result) => {
+        const settings = {
+          autoEnable: result.autoEnable || false,
+          channelList: result.channelList || [],
+          disableChannelList: result.disableChannelList || [],
+          titleKeywordList: result.titleKeywordList || [],
+        };
 
-      if (settings.autoEnable) {
-        applyMode(btn, ACTION.ENABLE, REASON.GLOBAL, null);
-        return;
+        if (settings.autoEnable) {
+          applyMode(btn, ACTION.ENABLE, REASON.GLOBAL, null);
+          return;
+        }
+
+        checkInterval = applyChannelBasedMode(btn, settings);
       }
-
-      checkInterval = applyChannelBasedMode(btn, settings);
-    });
+    );
   }, 250);
 }
 function enableAudioMode(btn) {
@@ -450,7 +453,7 @@ function showToast(message) {
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    getPriorityMode: function (channelName, videoTitle, settings) {
+    getPriorityMode: (channelName, videoTitle, settings) => {
       const { action } = getModeAction(settings, channelName, videoTitle);
       return action === ACTION.ENABLE ? 'ENABLED' : 'DISABLED';
     },

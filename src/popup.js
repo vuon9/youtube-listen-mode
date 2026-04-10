@@ -60,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     addChannel(titleKeywordInput, 'titleKeywordList', titleKeywordListContainer)
   );
   titleKeywordInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addChannel(titleKeywordInput, 'titleKeywordList', titleKeywordListContainer);
+    if (e.key === 'Enter')
+      addChannel(titleKeywordInput, 'titleKeywordList', titleKeywordListContainer);
   });
   titleKeywordInput.addEventListener('input', () => validateRegex(titleKeywordInput));
 
