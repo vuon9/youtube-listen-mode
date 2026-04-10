@@ -17,22 +17,22 @@
   "commands": {
     "toggle-listen-mode": {
       "suggested_key": {
-        "default": "Alt+L",
-        "mac": "Command+Shift+L"
+        "default": "Alt+Shift+1",
+        "mac": "Alt+Shift+1"
       },
       "description": "Toggle listen mode for current video"
     },
     "quick-add-enable": {
       "suggested_key": {
-        "default": "Alt+E",
-        "mac": "Command+Shift+E"
+        "default": "Alt+Shift+2",
+        "mac": "Alt+Shift+2"
       },
       "description": "Add current channel to enable list"
     },
     "quick-add-disable": {
       "suggested_key": {
-        "default": "Alt+D",
-        "mac": "Command+Shift+D"
+        "default": "Alt+Shift+3",
+        "mac": "Alt+Shift+3"
       },
       "description": "Add current channel to disable list"
     }

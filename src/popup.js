@@ -127,29 +127,4 @@ document.addEventListener('DOMContentLoaded', () => {
       container.appendChild(tag);
     });
   }
-
-  // Platform-specific shortcut display
-  function updateShortcutDisplay() {
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-
-    const shortcuts = {
-      'shortcut-toggle': isMac ? ['Cmd', 'Shift', 'L'] : ['Alt', 'L'],
-      'shortcut-enable': isMac ? ['Cmd', 'Shift', 'E'] : ['Alt', 'E'],
-      'shortcut-disable': isMac ? ['Cmd', 'Shift', 'D'] : ['Alt', 'D'],
-    };
-
-    for (const [id, keys] of Object.entries(shortcuts)) {
-      const container = document.getElementById(id);
-      if (!container) continue;
-
-      container.innerHTML = keys
-        .map((key, i) => {
-          const html = `<span class="key">${key}</span>`;
-          return i < keys.length - 1 ? html + '<span class="plus">+</span>' : html;
-        })
-        .join('');
-    }
-  }
-
-  updateShortcutDisplay();
 });
