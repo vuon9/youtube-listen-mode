@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.4...v1.12.0) (2026-04-10)
+
+
+### Features
+
+* add title keyword matching and keyboard shortcuts ([#44](https://github.com/vuon9/youtube-listen-mode/issues/44)) ([1332ba0](https://github.com/vuon9/youtube-listen-mode/commit/1332ba071c803d447e542ab01680ea1b971d965d))
+
 ## [1.11.4](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.3...v1.11.4) (2026-04-09)
 
 
