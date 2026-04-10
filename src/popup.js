@@ -11,17 +11,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const addDisableChannelBtn = document.getElementById('addDisableChannelBtn');
   const disableChannelListContainer = document.getElementById('disableChannelList');
 
+  // Title keyword elements
+  const titleKeywordInput = document.getElementById('titleKeywordInput');
+  const addTitleKeywordBtn = document.getElementById('addTitleKeywordBtn');
+  const titleKeywordListContainer = document.getElementById('titleKeywordList');
+
   // Load settings
   chrome.storage.local.get(
     {
       autoEnable: false,
       channelList: [],
       disableChannelList: [],
+      titleKeywordList: [],
     },
     (result) => {
       autoEnableCheckbox.checked = result.autoEnable;
       renderChannels(result.channelList, channelListContainer, 'channelList');
       renderChannels(result.disableChannelList, disableChannelListContainer, 'disableChannelList');
+      renderChannels(result.titleKeywordList, titleKeywordListContainer, 'titleKeywordList');
     }
   );
 
@@ -47,6 +54,15 @@ document.addEventListener('DOMContentLoaded', () => {
       addChannel(disableChannelInput, 'disableChannelList', disableChannelListContainer);
   });
   disableChannelInput.addEventListener('input', () => validateRegex(disableChannelInput));
+
+  // Title keyword events
+  addTitleKeywordBtn.addEventListener('click', () =>
+    addChannel(titleKeywordInput, 'titleKeywordList', titleKeywordListContainer)
+  );
+  titleKeywordInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addChannel(titleKeywordInput, 'titleKeywordList', titleKeywordListContainer);
+  });
+  titleKeywordInput.addEventListener('input', () => validateRegex(titleKeywordInput));
 
   function validateRegex(input) {
     const val = input.value.trim();
@@ -110,4 +126,29 @@ document.addEventListener('DOMContentLoaded', () => {
       container.appendChild(tag);
     });
   }
+
+  // Platform-specific shortcut display
+  function updateShortcutDisplay() {
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
+    const shortcuts = {
+      'shortcut-toggle': isMac ? ['Cmd', 'Shift', 'L'] : ['Alt', 'L'],
+      'shortcut-enable': isMac ? ['Cmd', 'Shift', 'E'] : ['Alt', 'E'],
+      'shortcut-disable': isMac ? ['Cmd', 'Shift', 'D'] : ['Alt', 'D'],
+    };
+
+    for (const [id, keys] of Object.entries(shortcuts)) {
+      const container = document.getElementById(id);
+      if (!container) continue;
+
+      container.innerHTML = keys
+        .map((key, i) => {
+          const html = `<span class="key">${key}</span>`;
+          return i < keys.length - 1 ? html + '<span class="plus">+</span>' : html;
+        })
+        .join('');
+    }
+  }
+
+  updateShortcutDisplay();
 });

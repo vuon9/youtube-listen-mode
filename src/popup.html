@@ -49,6 +49,30 @@
                 <div id="channelList" class="tags-container">
                     <!-- Tags will be injected here -->
                 </div>
+
+                <div class="section-badge enable">
+                    <span class="badge-icon">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 6h16M4 12h16M4 18h12"></path>
+                        </svg>
+                    </span>
+                    <h2>OR IF TITLE CONTAINS</h2>
+                    <span class="new-badge">NEW</span>
+                </div>
+                <div class="input-card">
+                    <input type="text" id="titleKeywordInput" placeholder="Add title keyword or regex...">
+                    <button class="add-button" id="addTitleKeywordBtn" title="Add">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="titleKeywordList" class="tags-container title-tags">
+                    <!-- Tags will be injected here -->
+                </div>
             </section>
 
             <!-- Disable Section -->
@@ -100,6 +124,42 @@
                 <input type="checkbox" id="autoEnable">
                 <span class="ios-slider"></span>
             </label>
+        </div>
+
+        <!-- Keyboard Shortcuts Section -->
+        <div class="shortcuts-section">
+            <div class="shortcuts-header">
+                <h3>Keyboard Shortcuts</h3>
+                <span class="new-badge">NEW</span>
+            </div>
+
+            <div class="shortcut-item">
+                <div class="shortcut-info">
+                    <span class="shortcut-icon">🎧</span>
+                    <span class="shortcut-name">Toggle Listen Mode</span>
+                </div>
+                <div class="shortcut-keys" id="shortcut-toggle"></div>
+            </div>
+
+            <div class="shortcut-item">
+                <div class="shortcut-info">
+                    <span class="shortcut-icon">➕</span>
+                    <span class="shortcut-name">Add to Enable List</span>
+                </div>
+                <div class="shortcut-keys" id="shortcut-enable"></div>
+            </div>
+
+            <div class="shortcut-item">
+                <div class="shortcut-info">
+                    <span class="shortcut-icon">➖</span>
+                    <span class="shortcut-name">Add to Disable List</span>
+                </div>
+                <div class="shortcut-keys" id="shortcut-disable"></div>
+            </div>
+
+            <div class="shortcuts-tip">
+                💡 Shortcuts work even when this popup is closed
+            </div>
         </div>
     </div>
     <script src="popup.js"></script>
