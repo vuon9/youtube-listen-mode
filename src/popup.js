@@ -145,23 +145,23 @@ document.addEventListener('DOMContentLoaded', () => {
       const tag = document.createElement('div');
       tag.className = `tag${item.matchTitle ? ' title-match' : ''}`;
 
-      const text = document.createElement('span');
-      text.className = 'tag-text';
-      text.textContent = item.pattern;
-      tag.appendChild(text);
-
       // matchTitle toggle button
       const toggleBtn = document.createElement('span');
       toggleBtn.className = `title-toggle${item.matchTitle ? ' active' : ''}`;
       toggleBtn.title = item.matchTitle
-        ? 'Also matching video titles — click to disable'
-        : 'Only matching channel names — click to also match video titles';
+        ? 'Also matching video titles'
+        : 'Only matching channel names';
       toggleBtn.textContent = 'T';
       toggleBtn.onclick = (e) => {
         e.stopPropagation();
         toggleMatchTitle(item.pattern);
       };
       tag.appendChild(toggleBtn);
+
+      const text = document.createElement('span');
+      text.className = 'tag-text';
+      text.textContent = item.pattern;
+      tag.appendChild(text);
 
       // Remove button
       const removeBtn = document.createElement('span');

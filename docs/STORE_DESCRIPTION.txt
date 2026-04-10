@@ -1,19 +1,22 @@
-🎧 YouTube Listen Mode: Pure Audio, Zero Distraction.
+🎧 YouTube has the content, especially music videos; Listen Mode gives you the freedom. Stop watching what you only need to hear. The extension will bring you lightweight audio mode and significantly reduce CPU usage, RAM and save your battery.
 
-Love YouTube but tired of the data-heavy video stream? YouTube Listen Mode turns your favorite videos into a background audio experience with a single click. Save bandwidth, reduce CPU usage, and focus on the content that matters.
-
-✨ Key Features:
+✨ Features:
 • One-Click Toggle: Instantly switch between video and audio-only mode.
 • Auto-Enable Rules: Set it to activate globally or only for specific channels.
 • Priority Logic: Intelligent handling of your global and channel-specific preferences.
   - #1 High: Global "Always Enable" overrides everything.
   - #2 Normal: "Disable for Channels" overrides the enable list.
   - #3 Low: "Enable for Channels" applies if no higher rules match.
-• Bandwidth Saver (NEW): Automatically drops video quality to 144p when enabled, then perfectly restores it when you’re done.
-• Keyword Matching Patterns (NEW): Filtering with substring and Regex support:
+• Keyword Matching Patterns: Filtering with substring and Regex support:
   - Exact: "Lofi Girl" matches only that specific channel
   - Prefix: Use "/^Travel/i" to match channels starting with "Travel"
   - Suffix: " Topic" matches auto-generated "Artist - Topic" channels
   - Advanced: Use "/(Music|Records|VEVO)$/i" to match multiple music suffixes at once
+• Each keyword can also match video titles (NEW) - toggle the T badge on any keyword to auto-enable when a video title contains it, regardless of the channel.
+• Bandwidth Saver (NEW): Automatically drops video quality to 144p when enabled, then perfectly restores it when you’re done.
+• Keyboard Shortcuts (NEW): Quick access without opening the popup and customizable in the extension settings:
+  - Opt+Shift+1 / Alt+Shift+1: Toggle listen mode on/off
+  - Opt+Shift+2 / Alt+Shift+2: Add current channel to enable list
+  - Opt+Shift+3 / Alt+Shift+3: Add current channel to disable list
 
-Open Source & Transparent: https://github.com/vuon9/youtube-listen-mode
+It's open-source: https://github.com/vuon9/youtube-listen-mode
