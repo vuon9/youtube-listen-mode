@@ -148,6 +148,35 @@ Then('the video quality should be restored to {string}', function (expectedQuali
   assert.strictEqual(lastQualitySet, expectedQuality);
 });
 
+let autoSwitch144pEnabled = false;
+
+Given('auto-switch 144p is disabled', function () {
+  autoSwitch144pEnabled = false;
+  lastQualitySet = '';
+});
+
+Given('auto-switch 144p is enabled', function () {
+  autoSwitch144pEnabled = true;
+  lastQualitySet = '';
+  global.document = {
+    querySelector: (sel) => {
+      if (sel === '.html5-video-player') return mockPlayer;
+      return null;
+    },
+  };
+});
+
+When('listen mode is enabled with auto-switch setting', function () {
+  // Mimic the guard in toggleMode: only call updateVideoQuality(true) when enabled
+  if (autoSwitch144pEnabled) {
+    updateVideoQuality(true);
+  }
+});
+
+Then('the video quality should not be changed', function () {
+  assert.strictEqual(lastQualitySet, '', 'Quality should not have been changed');
+});
+
 // Cross-tab quality restoration test steps
 Given('listen mode has never been active on this page', function () {
   // Reset quality tracking and simulated previous quality

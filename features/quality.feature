@@ -17,3 +17,13 @@ Feature: Video Quality Control
     Given listen mode has never been active on this page
     When listen mode should be disabled
     Then video quality should be restored to default
+
+  Scenario: Quality is not changed when auto-switch is disabled
+    Given auto-switch 144p is disabled
+    When listen mode is enabled with auto-switch setting
+    Then the video quality should not be changed
+
+  Scenario: Quality is set to tiny when auto-switch is enabled
+    Given auto-switch 144p is enabled
+    When listen mode is enabled with auto-switch setting
+    Then the video quality should be set to "tiny"

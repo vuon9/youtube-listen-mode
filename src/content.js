@@ -5,6 +5,7 @@ if (typeof document !== 'undefined') {
 }
 
 let checkInterval = null;
+let shouldSwitchQuality = false;
 
 const SVG_HEADPHONES = `
 <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope yt-icon" style="pointer-events: none; display: block; width: 50%; height: 50%;">
@@ -96,7 +97,9 @@ function toggleMode(btn) {
   if (!player.querySelector('.ytb-listen-mode-overlay')) {
     player.appendChild(createOverlay());
   }
-  updateVideoQuality(true);
+  if (shouldSwitchQuality) {
+    updateVideoQuality(true);
+  }
 }
 
 // Helper to get channel name
@@ -229,12 +232,13 @@ function checkSettingsAndApply(btn) {
       checkInterval = null;
     }
 
-    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
+    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList', 'autoSwitch144p'], (result) => {
       const settings = {
         autoEnable: result.autoEnable || false,
         channelList: result.channelList || [],
         disableChannelList: result.disableChannelList || [],
       };
+      shouldSwitchQuality = result.autoSwitch144p || false;
 
       if (settings.autoEnable) {
         applyMode(btn, ACTION.ENABLE, REASON.GLOBAL, null);
