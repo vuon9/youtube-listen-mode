@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/vuon9/youtube-listen-mode/compare/v1.12.0...v1.12.1) (2026-05-01)
+
+
+### Bug Fixes
+
+* remove 144p toggle, always enable quality switch, fix navigation races ([#46](https://github.com/vuon9/youtube-listen-mode/issues/46)) ([3436f32](https://github.com/vuon9/youtube-listen-mode/commit/3436f3276c645759a3b948ef2c858891b0116f65))
+
 ## [1.12.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.11.4...v1.12.0) (2026-04-10)
 
 
