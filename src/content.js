@@ -109,8 +109,8 @@ function getChannelName() {
   for (const sel of selectors) {
     const el = document.querySelector(sel);
     if (el?.textContent) {
-      const name = el.textContent.trim().replace(/\s+/g, ' ');
-      if (name) return name;
+      const title = el.textContent.trim().replace(/\s+/g, ' ');
+      if (title) return title;
     }
   }
   return null;
