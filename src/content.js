@@ -5,7 +5,6 @@ if (typeof document !== 'undefined') {
 }
 
 let checkInterval = null;
-let shouldSwitchQuality = false;
 
 const SVG_HEADPHONES = `
 <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false" class="style-scope yt-icon" style="pointer-events: none; display: block; width: 50%; height: 50%;">
@@ -97,9 +96,7 @@ function toggleMode(btn) {
   if (!player.querySelector('.ytb-listen-mode-overlay')) {
     player.appendChild(createOverlay());
   }
-  if (shouldSwitchQuality) {
-    updateVideoQuality(true);
-  }
+  updateVideoQuality(true);
 }
 
 // Helper to get channel name
@@ -111,7 +108,7 @@ function getChannelName() {
 
   for (const sel of selectors) {
     const el = document.querySelector(sel);
-    if (el && el.textContent) {
+    if (el?.textContent) {
       const name = el.textContent.trim().replace(/\s+/g, ' ');
       if (name) return name;
     }
@@ -198,8 +195,10 @@ function applyChannelBasedMode(btn, settings) {
   });
 }
 
-// Poll for channel name and video title with timeout
-function pollVideoInfo(callback, interval = 500, maxAttempts = 20) {
+// Poll for channel name and video title. Keeps retrying for up to 30s
+// (60 attempts at 500ms) since YouTube may lazily render channel info
+// after SPA navigation or bfcache restoration.
+function pollVideoInfo(callback, interval = 500, maxAttempts = 60) {
   let attempts = 0;
   const id = setInterval(() => {
     attempts++;
@@ -232,13 +231,12 @@ function checkSettingsAndApply(btn) {
       checkInterval = null;
     }
 
-    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList', 'autoSwitch144p'], (result) => {
+    chrome.storage.local.get(['autoEnable', 'channelList', 'disableChannelList'], (result) => {
       const settings = {
         autoEnable: result.autoEnable || false,
         channelList: result.channelList || [],
         disableChannelList: result.disableChannelList || [],
       };
-      shouldSwitchQuality = result.autoSwitch144p || false;
 
       if (settings.autoEnable) {
         applyMode(btn, ACTION.ENABLE, REASON.GLOBAL, null);
@@ -332,7 +330,7 @@ function init() {
   observer.observe(document.body, { childList: true, subtree: true });
 
   // Handle SPA navigation
-  window.addEventListener('yt-navigate-finish', () => {
+  function onNavigate() {
     const btn = document.querySelector('.ytb-listen-mode-btn');
     if (btn) {
       // Clean up old state from previous video to prevent false toggle events
@@ -344,6 +342,18 @@ function init() {
         btn.title = 'Enable Listen Mode';
       }
       checkSettingsAndApply(btn);
+    }
+  }
+
+  window.addEventListener('yt-navigate-finish', onNavigate);
+
+  // Handle bfcache restoration (browser back/forward).
+  // Chrome may restore the page from cache instead of reloading —
+  // yt-navigate-finish may not fire in this case. Re-trigger auto-enable.
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      console.log('[YLM] Page restored from bfcache, re-applying mode');
+      onNavigate();
     }
   });
 }

@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   const autoEnableCheckbox = document.getElementById('autoEnable');
-  const autoSwitch144pCheckbox = document.getElementById('autoSwitch144p');
 
   const channelInput = document.getElementById('channelInput');
   const addChannelBtn = document.getElementById('addChannelBtn');
@@ -50,12 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
       channelList: [],
       disableChannelList: [],
       titleKeywordList: [],
-      autoSwitch144p: false,
     },
     (result) => {
       migrateOldData(result);
       autoEnableCheckbox.checked = result.autoEnable;
-      autoSwitch144pCheckbox.checked = result.autoSwitch144p;
       renderEnableList(result.channelList, channelListContainer);
       renderDisableList(result.disableChannelList, disableChannelListContainer);
     }
@@ -64,11 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Save autoEnable setting
   autoEnableCheckbox.addEventListener('change', () => {
     chrome.storage.local.set({ autoEnable: autoEnableCheckbox.checked });
-  });
-
-  // Save autoSwitch144p setting
-  autoSwitch144pCheckbox.addEventListener('change', () => {
-    chrome.storage.local.set({ autoSwitch144p: autoSwitch144pCheckbox.checked });
   });
 
   // Add channel events
