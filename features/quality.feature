@@ -17,3 +17,7 @@ Feature: Video Quality Control
     Given listen mode has never been active on this page
     When listen mode should be disabled
     Then video quality should be restored to default
+
+  Scenario: Quality is always set to tiny when listen mode enables
+    Given Listen Mode is being enabled
+    Then the video quality should be set to "tiny"

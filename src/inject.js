@@ -2,8 +2,29 @@
   console.log('[YLM] Inject script loaded');
   let previousQuality = 'default';
   let currentTargetQuality = null;
+  let tinyEnforceTimer = null;
+  let navRestoreTimers = [];
+
+  function cancelTinyEnforcement() {
+    if (tinyEnforceTimer) {
+      clearInterval(tinyEnforceTimer);
+      tinyEnforceTimer = null;
+    }
+  }
+
+  function cancelNavRestoreTimers() {
+    navRestoreTimers.forEach(clearTimeout);
+    navRestoreTimers = [];
+  }
 
   function updateQuality(quality) {
+    // If we're no longer targeting tiny, stop enforcement and cancel
+    // any pending navigation-restore retries so they don't undo us.
+    if (quality !== 'tiny') {
+      cancelTinyEnforcement();
+    } else {
+      cancelNavRestoreTimers();
+    }
     const player =
       document.getElementById('movie_player') || document.querySelector('.html5-video-player');
     if (!player) {
@@ -11,9 +32,13 @@
       return;
     }
 
+    const available =
+      typeof player.getAvailableQualityLevels === 'function'
+        ? player.getAvailableQualityLevels()
+        : [];
     const currentQ =
       typeof player.getPlaybackQuality === 'function' ? player.getPlaybackQuality() : 'unknown';
-    console.log(`[YLM] Setting quality to ${quality} (Current: ${currentQ})`);
+    console.log(`[YLM] Setting quality to ${quality} (Current: ${currentQ}, Available: [${available}]`);
 
     // Avoid redundant calls if already at target quality
     if (currentQ === quality && (quality !== 'tiny' || quality === 'unknown')) {
@@ -21,22 +46,33 @@
       return;
     }
 
-    // Store current quality before switching to tiny
+    // Store current quality before switching to tiny.
+    // Skip 'auto' and 'unknown' — they aren't real quality levels
+    // and can't be used later to unlock the player from 'tiny'.
     if (quality === 'tiny') {
-      if (currentQ !== 'tiny' && currentQ !== 'unknown') {
+      if (currentQ !== 'tiny' && currentQ !== 'unknown' && currentQ !== 'auto') {
         previousQuality = currentQ;
         console.log('[YLM] Remembered previous quality:', previousQuality);
       }
     } else if (quality === 'default') {
-      // Restore to previous quality or 'auto' if never set
-      if (previousQuality === 'default') {
-        // Never recorded a quality, use 'auto' to let YouTube decide
-        console.log('[YLM] No previous quality recorded, using auto');
-        quality = 'auto';
-      } else if (previousQuality !== 'tiny') {
-        // Use the recorded previous quality
+      // Restore to recorded quality, or use a reasonable fallback
+      if (previousQuality !== 'tiny' && previousQuality !== 'default') {
         console.log('[YLM] Restoring to previous quality:', previousQuality);
         quality = previousQuality;
+      } else {
+        // No recorded quality (fresh session or cross-tab persistence).
+        // Pick the best available HD quality so we don't leave the user
+        // stuck at 720p when 1080p (or higher) is available.
+        const tiers = ['hd1080', 'hd720', 'large', 'medium'];
+        let best = 'hd720';
+        for (const tier of tiers) {
+          if (available.includes(tier)) {
+            best = tier;
+            break;
+          }
+        }
+        console.log('[YLM] No previous quality recorded, using', best, 'fallback');
+        quality = best;
       }
     }
 
@@ -51,7 +87,14 @@
       if (q === quality && quality !== 'tiny') return;
 
       if (typeof player.setPlaybackQualityRange === 'function') {
-        player.setPlaybackQualityRange(quality, quality);
+        // Lock to 'tiny' with two-arg (min,max) so YouTube can't auto-escalate.
+        // For restoring from 'tiny', use single-arg (minimum-only) — two-arg
+        // restore calls are ignored when the player was previously locked.
+        if (quality === 'tiny') {
+          player.setPlaybackQualityRange(quality, quality);
+        } else {
+          player.setPlaybackQualityRange(quality);
+        }
       }
       if (typeof player.setPlaybackQuality === 'function') {
         player.setPlaybackQuality(quality);
@@ -67,9 +110,46 @@
     }
 
     apply();
-    // Retries for robustness ONLY when enabling 144p (tiny) mode
+
+    // Enforce tiny quality for a few seconds after switching.
+    // YouTube (or our own navigation handler) may race to restore quality
+    // before content.js re-enables listen mode on the next video.
+    // This loop catches and corrects any premature quality restoration.
     if (quality === 'tiny') {
-      [500, 1000, 2000].forEach((delay) => setTimeout(apply, delay));
+      cancelTinyEnforcement();
+      let ticks = 0;
+      const MAX_TICKS = 10; // 5 seconds at 500ms intervals
+      const enforceUrl = location.href;
+      tinyEnforceTimer = setInterval(() => {
+        // If the URL changed under us (navigation without an event),
+        // kill the loop. content.js will restart it if appropriate.
+        if (location.href !== enforceUrl) {
+          cancelTinyEnforcement();
+          return;
+        }
+        ticks++;
+        const player =
+          document.getElementById('movie_player') || document.querySelector('.html5-video-player');
+        if (!player) {
+          cancelTinyEnforcement();
+          return;
+        }
+        const q =
+          typeof player.getPlaybackQuality === 'function'
+            ? player.getPlaybackQuality()
+            : 'unknown';
+        // 'unknown' means the player is being rebuilt (navigation transition).
+        // Don't interfere and don't count this tick — the player isn't ready.
+        if (q === 'unknown') {
+          ticks--;
+        } else if (q !== 'tiny') {
+          console.log('[YLM] Quality drifted to', q, '- re-enforcing tiny');
+          apply();
+        }
+        if (ticks >= MAX_TICKS) {
+          cancelTinyEnforcement();
+        }
+      }, 500);
     }
   }
 
@@ -81,35 +161,56 @@
     }
   });
 
-  // Reset previous quality on navigation to ensure we capture the fresh quality for the next video
-  window.addEventListener('yt-navigate-finish', () => {
-    previousQuality = 'default';
-    console.log('[YLM] Reset previous quality due to navigation');
+  // On navigation, if we're stuck at 'tiny' from a previous listen mode session,
+  // restore quality to default.
+  let lastUrl = location.href;
 
-    // Early quality restoration: try to restore quality to auto immediately
-    // This prevents videos from starting at low quality when listen mode was enabled in another tab
-    // If listen mode should be enabled, content.js will dispatch 'tiny' which overrides this
-    function restoreToAuto() {
+  function onNavigate() {
+    // Ignore spurious popstate events that don't change the URL
+    const url = location.href;
+    if (url === lastUrl) return;
+    lastUrl = url;
+
+    console.log('[YLM] Navigation detected, checking if quality needs restoration');
+    // Kill enforcement immediately so it can't fire between now and when
+    // we find the player. If the new video is whitelisted, content.js will
+    // dispatch 'tiny' which starts a fresh loop.
+    cancelTinyEnforcement();
+    cancelNavRestoreTimers();
+
+    function restoreToDefault() {
       const player =
         document.getElementById('movie_player') || document.querySelector('.html5-video-player');
       if (!player) return false;
 
       const currentQ =
         typeof player.getPlaybackQuality === 'function' ? player.getPlaybackQuality() : 'unknown';
-      // Only restore if currently at 'tiny' (was set by listen mode in another tab)
       if (currentQ === 'tiny') {
-        console.log('[YLM] Early restoration: resetting low quality to auto');
-        updateQuality('default'); // 'default' becomes 'auto' in updateQuality
-        return true;
+        console.log('[YLM] Navigation: resetting stuck low quality to default');
+        updateQuality('default');
       }
-      return false;
+      // If quality is not tiny, YouTube already switched — nothing to restore.
+      // Enforcement was already killed above, so it won't re-apply 'tiny'.
+      return true;
     }
 
-    // Try immediately, then with retries if player isn't ready
-    if (!restoreToAuto()) {
+    // Try immediately, then with retries if player isn't ready.
+    // Track timers so a later tiny request can cancel them.
+    if (!restoreToDefault()) {
       [100, 300, 500, 1000, 2000].forEach((delay) => {
-        setTimeout(() => restoreToAuto(), delay);
+        navRestoreTimers.push(setTimeout(() => restoreToDefault(), delay));
       });
     }
+  }
+
+  // YouTube's SPA navigation event (most navigations)
+  window.addEventListener('yt-navigate-finish', onNavigate);
+
+  // Browser back/forward (YouTube may use history.replaceState, skipping yt-navigate-finish)
+  window.addEventListener('popstate', onNavigate);
+
+  // bfcache restoration (page restored from back/forward cache)
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) onNavigate();
   });
 })();
