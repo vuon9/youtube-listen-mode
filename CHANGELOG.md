@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.2](https://github.com/vuon9/youtube-listen-mode/compare/v1.12.1...v1.12.2) (2026-05-09)
+
+
+### Bug Fixes
+
+* scope channel name detection to video owner area and verify quality on navigation ([#50](https://github.com/vuon9/youtube-listen-mode/issues/50)) ([efc4093](https://github.com/vuon9/youtube-listen-mode/commit/efc4093e8093d8047a588f0a2e0b0c435de81da4))
+
 ## [1.12.1](https://github.com/vuon9/youtube-listen-mode/compare/v1.12.0...v1.12.1) (2026-05-01)
 
 
