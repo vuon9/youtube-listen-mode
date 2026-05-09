@@ -4,6 +4,7 @@ const {
   getPriorityMode,
   updateVideoQuality,
   disableAudioMode,
+  getChannelName,
   _createMockButton,
 } = require('../../src/content.js');
 
@@ -43,6 +44,8 @@ Before(function () {
   currentChannel = '';
   currentTitle = '';
   actualMode = '';
+  Object.keys(mockElements).forEach((k) => delete mockElements[k]);
+  delete global.document;
 });
 
 Given('global auto-enable is {string}', function (state) {
@@ -202,4 +205,54 @@ When('I check the mode for a video with title {string}', function (title) {
   currentChannel = 'SomeChannel';
   currentTitle = title;
   actualMode = getPriorityMode(currentChannel, currentTitle, settings);
+});
+
+// Channel Detection Steps
+const mockElements = {};
+
+function buildMockDocument() {
+  return {
+    querySelector: (sel) => {
+      if (sel === '#owner .ytd-channel-name .yt-formatted-string')
+        return mockElements['#owner'] ?? null;
+      return mockElements[sel] ?? null;
+    },
+  };
+}
+
+Given('the page has channel name elements', function () {
+  global.document = buildMockDocument();
+});
+
+Given('{string} contains channel {string}', function (selector, channel) {
+  mockElements['#owner'] = { textContent: channel };
+  global.document = buildMockDocument();
+});
+
+Given('a non-owner channel {string} also exists', function (channel) {
+  mockElements['.ytd-channel-name .yt-formatted-string'] = { textContent: channel };
+});
+
+Given('there is no {string} element', function (selector) {
+  delete mockElements['#owner'];
+  global.document = buildMockDocument();
+});
+
+Given('{string} contains no channel name', function (selector) {
+  mockElements['#owner'] = { textContent: '' };
+  delete mockElements['.ytd-channel-name .yt-formatted-string'];
+  delete mockElements['ytd-watch-metadata .ytd-channel-name .yt-formatted-string'];
+  global.document = buildMockDocument();
+});
+
+Given('a non-owner channel {string} exists', function (channel) {
+  mockElements['.ytd-channel-name .yt-formatted-string'] = { textContent: channel };
+});
+
+When('I get the channel name', function () {
+  this.detectedChannel = getChannelName();
+});
+
+Then('the detected channel should be {string}', function (expected) {
+  assert.strictEqual(this.detectedChannel, expected === 'null' ? null : expected);
 });
