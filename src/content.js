@@ -103,8 +103,11 @@ function toggleMode(btn) {
 function getChannelName() {
   if (typeof document === 'undefined') return null;
 
-  // Modern YouTube selectors
-  const selectors = ['.ytd-channel-name .yt-formatted-string'];
+  const selectors = [
+    '#owner .ytd-channel-name .yt-formatted-string',
+    'ytd-watch-metadata .ytd-channel-name .yt-formatted-string',
+    '.ytd-channel-name .yt-formatted-string',
+  ];
 
   for (const sel of selectors) {
     const el = document.querySelector(sel);
@@ -307,6 +310,7 @@ function applyMode(btn, action, reason, channelName) {
 // Observe for player controls
 function init() {
   if (typeof document === 'undefined') return;
+
   const observer = new MutationObserver((mutations) => {
     // Only react to significant changes (like adding nodes)
     const hasNewNodes = mutations.some((m) => m.addedNodes.length > 0);
@@ -483,6 +487,7 @@ if (typeof module !== 'undefined') {
     updateVideoQuality: updateVideoQuality,
     disableAudioMode: disableAudioMode,
     matchesPattern: matchesPattern,
+    getChannelName: getChannelName,
     _createMockButton: () => ({
       innerHTML: '',
       title: '',
