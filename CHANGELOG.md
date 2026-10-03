@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/vuon9/youtube-listen-mode/compare/v1.12.2...v1.13.0) (2026-10-03)
+
+
+### Features
+
+* add pause/play control to listen mode overlay ([#54](https://github.com/vuon9/youtube-listen-mode/issues/54)) ([fcb226b](https://github.com/vuon9/youtube-listen-mode/commit/fcb226b55aed96e3868f9ed8e2c0f58d71591c78))
+
 ## [1.12.2](https://github.com/vuon9/youtube-listen-mode/compare/v1.12.1...v1.12.2) (2026-05-09)
 
 
