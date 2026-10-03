@@ -18,6 +18,18 @@ const SVG_VIDEO = `
 </svg>
 `;
 
+const SVG_PLAY = `
+<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" class="ytb-listen-mode-glyph ytb-play" style="display: block; width: 100%; height: 100%; fill: #fff;">
+  <path d="M8 5v14l11-7z"></path>
+</svg>
+`;
+
+const SVG_PAUSE = `
+<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" class="ytb-listen-mode-glyph ytb-pause" style="display: block; width: 100%; height: 100%; fill: #fff;">
+  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
+</svg>
+`;
+
 const ACTION = { ENABLE: 'enable', DISABLE: 'disable' };
 const REASON = {
   GLOBAL: 'global',
@@ -43,18 +55,131 @@ function createOverlay() {
   if (typeof document === 'undefined') return;
   const overlay = document.createElement('div');
   overlay.className = 'ytb-listen-mode-overlay';
+  overlay.title = 'Pause';
 
-  // Icon
+  const content = document.createElement('div');
+  content.className = 'ytb-listen-mode-content';
+
+  const logo = document.createElement('div');
+  logo.className = 'ytb-listen-mode-logo';
+
   const icon = document.createElement('img');
   icon.src = chrome.runtime.getURL('images/icon128.png');
-  overlay.appendChild(icon);
+  logo.appendChild(icon);
+  content.appendChild(logo);
 
   // Text
   const text = document.createElement('span');
   text.innerText = 'Audio Only Mode';
-  overlay.appendChild(text);
+  content.appendChild(text);
+  overlay.appendChild(content);
+
+  // Play/pause indicator, hidden until hover and flashed on click
+  const state = document.createElement('div');
+  state.className = 'ytb-listen-mode-state';
+  state.addEventListener('animationend', () => {
+    state.classList.remove('ytb-flash');
+    overlay.classList.remove('ytb-flashing');
+  });
+  overlay.appendChild(state);
+
+  const getPlayer = () =>
+    document.querySelector('.html5-video-player') || overlay.closest?.('.html5-video-player');
+
+  // Delay a single click so a double click can cancel it and toggle
+  // fullscreen instead, preserving YouTube's default double-click behavior.
+  overlay.addEventListener('click', () => {
+    if (overlay._clickTimer) return;
+    const video = getVideoEl(getPlayer());
+    setOverlayState(overlay, video ? !video.paused : true);
+    flashState(state);
+    overlay._clickTimer = setTimeout(() => {
+      overlay._clickTimer = null;
+      togglePlayback(getPlayer());
+    }, 220);
+  });
+
+  overlay.addEventListener('dblclick', () => {
+    if (overlay._clickTimer) {
+      clearTimeout(overlay._clickTimer);
+      overlay._clickTimer = null;
+    }
+    getPlayer()?.querySelector('.ytp-fullscreen-button')?.click();
+  });
+
+  const video = getVideoEl(getPlayer());
+  if (video) {
+    const onPlay = () => setOverlayState(overlay, false);
+    const onPause = () => setOverlayState(overlay, true);
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
+    overlay._video = video;
+    overlay._onPlay = onPlay;
+    overlay._onPause = onPause;
+    setOverlayState(overlay, video.paused);
+  } else {
+    setOverlayState(overlay, false);
+  }
 
   return overlay;
+}
+
+// Resolve the video element from the player, falling back to the page
+function getVideoEl(player) {
+  if (player && typeof player.querySelector === 'function') {
+    const video = player.querySelector('video');
+    if (video) return video;
+  }
+  if (typeof document !== 'undefined') return document.querySelector('video');
+  return null;
+}
+
+// Reflect paused/playing state on the overlay glyph
+function setOverlayState(overlay, paused) {
+  if (!overlay) return;
+  const state = overlay.querySelector('.ytb-listen-mode-state');
+  if (state) state.innerHTML = paused ? SVG_PLAY : SVG_PAUSE;
+  overlay.title = paused ? 'Play' : 'Pause';
+}
+
+// Replay the appear/auto-hide animation on the indicator
+function flashState(state) {
+  if (!state) return;
+  state.classList.remove('ytb-flash');
+  state.closest?.('.ytb-listen-mode-overlay')?.classList.add('ytb-flashing');
+  // Reading offsetWidth forces a reflow so the animation restarts
+  void state.offsetWidth;
+  state.classList.add('ytb-flash');
+}
+
+// Pause when playing, play when paused. Prefers the YouTube player API
+// (handles ads and player state) and falls back to the video element.
+function togglePlayback(player) {
+  const target =
+    player ||
+    (typeof document !== 'undefined' ? document.querySelector('.html5-video-player') : null);
+  const video = getVideoEl(target);
+  const isPlaying = video ? !video.paused : true;
+
+  if (isPlaying) {
+    if (typeof target?.pauseVideo === 'function') target.pauseVideo();
+    else video?.pause();
+    return;
+  }
+
+  if (typeof target?.playVideo === 'function') target.playVideo();
+  else video?.play();
+}
+
+// Tear down the overlay and the playback listeners it registered
+function destroyOverlay(overlay) {
+  if (!overlay) return;
+  if (overlay._clickTimer) clearTimeout(overlay._clickTimer);
+  if (overlay._video) {
+    overlay._video.removeEventListener('play', overlay._onPlay);
+    overlay._video.removeEventListener('pause', overlay._onPause);
+  }
+  overlay.remove();
 }
 
 // Function to update video quality
@@ -85,7 +210,7 @@ function toggleMode(btn) {
     player.classList.remove('ytb-listen-mode-active');
     btn.innerHTML = SVG_HEADPHONES;
     btn.title = 'Enable Listen Mode';
-    player.querySelector('.ytb-listen-mode-overlay')?.remove();
+    destroyOverlay(player.querySelector('.ytb-listen-mode-overlay'));
     updateVideoQuality(false);
     return;
   }
@@ -268,7 +393,7 @@ function disableAudioMode(btn) {
     player.classList.remove('ytb-listen-mode-active');
     btn.innerHTML = SVG_HEADPHONES;
     btn.title = 'Enable Listen Mode';
-    player.querySelector('.ytb-listen-mode-overlay')?.remove();
+    destroyOverlay(player.querySelector('.ytb-listen-mode-overlay'));
   }
 
   // Always restore quality when mode should be disabled
@@ -341,7 +466,7 @@ function init() {
       const player = document.querySelector('.html5-video-player');
       if (player) {
         player.classList.remove('ytb-listen-mode-active');
-        player.querySelector('.ytb-listen-mode-overlay')?.remove();
+        destroyOverlay(player.querySelector('.ytb-listen-mode-overlay'));
         btn.innerHTML = SVG_HEADPHONES;
         btn.title = 'Enable Listen Mode';
       }
@@ -488,6 +613,8 @@ if (typeof module !== 'undefined') {
     disableAudioMode: disableAudioMode,
     matchesPattern: matchesPattern,
     getChannelName: getChannelName,
+    togglePlayback: togglePlayback,
+    setOverlayState: setOverlayState,
     _createMockButton: () => ({
       innerHTML: '',
       title: '',
