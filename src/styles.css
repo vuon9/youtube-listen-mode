@@ -34,32 +34,94 @@
   width: 100%;
   height: 100%;
   background-color: #000;
-  /* purely black background as requested? or customized? stick to black/dark */
-  z-index: 100;
-  /* High enough to cover video but maybe below controls? controls are usually z-index > 60 */
+  /* Below YouTube controls (z-index 60+) so the control bar stays clickable */
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: white;
   font-family: Roboto, Arial, sans-serif;
-  pointer-events: none;
-  /* See through for clicks if needed, but we want to block video. Actually controls need to work. */
+  cursor: pointer;
+  pointer-events: auto;
 }
 
-/* We need controls to be visible. YT controls have high z-index (usually 60+).
-   The video element is 10.
-   So z-index 50 for overlay should cover video but stay under controls. */
-.ytb-listen-mode-overlay {
-  z-index: 10;
+/* Logo and label, nudged below the centered play/pause indicator */
+.ytb-listen-mode-overlay .ytb-listen-mode-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(26px);
 }
 
-/* Icon in overlay */
-.ytb-listen-mode-overlay img {
+/* Logo */
+.ytb-listen-mode-overlay .ytb-listen-mode-logo {
   width: 80px;
   height: 80px;
   margin-bottom: 20px;
+}
+
+.ytb-listen-mode-overlay .ytb-listen-mode-logo img {
+  width: 80px;
+  height: 80px;
   opacity: 0.8;
+}
+
+/* Play/pause indicator: centered, shown on hover, flashed on click */
+.ytb-listen-mode-overlay .ytb-listen-mode-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  padding: 18px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.ytb-listen-mode-overlay:hover .ytb-listen-mode-state {
+  opacity: 0.5;
+}
+
+.ytb-listen-mode-overlay .ytb-listen-mode-state.ytb-flash {
+  animation: ytb-icon-flash 0.9s ease forwards;
+}
+
+@keyframes ytb-icon-flash {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Dim the branding while the play/pause indicator is showing */
+.ytb-listen-mode-overlay .ytb-listen-mode-logo img,
+.ytb-listen-mode-overlay span {
+  transition: opacity 0.2s ease;
+}
+
+.ytb-listen-mode-overlay:hover .ytb-listen-mode-logo img,
+.ytb-listen-mode-overlay:hover span,
+.ytb-listen-mode-overlay.ytb-flashing .ytb-listen-mode-logo img,
+.ytb-listen-mode-overlay.ytb-flashing span {
+  opacity: 0.5;
 }
 
 .ytb-listen-mode-overlay span {

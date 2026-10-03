@@ -5,6 +5,8 @@ const {
   updateVideoQuality,
   disableAudioMode,
   getChannelName,
+  togglePlayback,
+  setOverlayState,
   _createMockButton,
 } = require('../../src/content.js');
 
@@ -44,6 +46,9 @@ Before(function () {
   currentChannel = '';
   currentTitle = '';
   actualMode = '';
+  playbackState = '';
+  overlayGlyph = null;
+  videoMock = null;
   Object.keys(mockElements).forEach((k) => delete mockElements[k]);
   delete global.document;
 });
@@ -255,4 +260,52 @@ When('I get the channel name', function () {
 
 Then('the detected channel should be {string}', function (expected) {
   assert.strictEqual(this.detectedChannel, expected === 'null' ? null : expected);
+});
+
+// Pause/play from overlay steps
+let playbackState = '';
+let overlayGlyph = null;
+let videoMock = null;
+
+Given('the video is {word}', (state) => {
+  videoMock = {
+    paused: state === 'paused',
+    pause() {},
+    play() {},
+  };
+});
+
+When('I toggle playback', () => {
+  const player = {
+    querySelector: (sel) => (sel === 'video' ? videoMock : null),
+    pauseVideo: () => {
+      playbackState = 'paused';
+      videoMock.paused = true;
+    },
+    playVideo: () => {
+      playbackState = 'playing';
+      videoMock.paused = false;
+    },
+  };
+  togglePlayback(player);
+});
+
+Then('the video should be {word}', (expected) => {
+  assert.strictEqual(playbackState, expected);
+});
+
+When('I set the overlay state to {word}', (state) => {
+  overlayGlyph = { innerHTML: '' };
+  const overlay = {
+    title: '',
+    querySelector: (sel) => (sel === '.ytb-listen-mode-state' ? overlayGlyph : null),
+  };
+  setOverlayState(overlay, state === 'paused');
+});
+
+Then('the overlay should show the {word} icon', (expected) => {
+  assert.ok(
+    overlayGlyph.innerHTML.includes(`ytb-${expected}`),
+    `expected the ${expected} glyph, got: ${overlayGlyph.innerHTML}`
+  );
 });
